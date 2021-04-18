@@ -22,7 +22,6 @@ class MainActivity : AppCompatActivity() {
 
         pokemonRosterViewModel.getPokemonList().observe(this, Observer(){pokemonList ->
             adapter.data = pokemonList
-            Log.d("","!!!!!!! $pokemonList")
         })
         pokemonRosterViewModel.loadData()
     }
