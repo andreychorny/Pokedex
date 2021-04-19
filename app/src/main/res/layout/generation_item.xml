@@ -5,17 +5,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:background="@color/teal_200"
-    android:layout_height="100dp">
+    android:layout_height="wrap_content">
 
 
-    <TextView
-        android:id="@+id/generationName"
+    <Button
+        android:id="@+id/changeGenerationButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="52sp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Generation-I" />
+        tools:text="IV" />
 </androidx.constraintlayout.widget.ConstraintLayout>

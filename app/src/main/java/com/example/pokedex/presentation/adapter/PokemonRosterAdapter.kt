@@ -13,7 +13,7 @@ import com.example.pokedex.domain.PokemonEntity
 import java.lang.IllegalStateException
 
 private const val ITEM_TYPE_POKEMON = 1
-private const val ITEM_TYPE_GENERATION = 2
+private const val ITEM_TYPE_GENERATION_LIST = 2
 class PokemonRosterAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     var data = listOf<RosterItem>()
@@ -27,7 +27,7 @@ class PokemonRosterAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when(viewType){
             ITEM_TYPE_POKEMON -> PokemonViewHolder.from(parent)
-            ITEM_TYPE_GENERATION -> GenerationViewHolder.from(parent)
+            ITEM_TYPE_GENERATION_LIST -> GenerationListViewHolder.from(parent)
             else -> throw IllegalStateException()
         }
     }
@@ -38,8 +38,8 @@ class PokemonRosterAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             is PokemonItem -> {
                 (holder as PokemonViewHolder).bind(item)
             }
-            is GenerationItem -> {
-                (holder as GenerationViewHolder).bind(item)
+            is GenerationListItem -> {
+                (holder as GenerationListViewHolder).bind(item)
             }
         }
     }
@@ -47,7 +47,7 @@ class PokemonRosterAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun getItemViewType(position: Int): Int {
         return when(data[position]) {
             is PokemonItem -> ITEM_TYPE_POKEMON
-            is GenerationItem -> ITEM_TYPE_GENERATION
+            is GenerationListItem -> ITEM_TYPE_GENERATION_LIST
         }
     }
 
@@ -61,7 +61,7 @@ class PokemonRosterAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             override fun getSpanSize(position: Int): Int {
                 return when (data[position]) {
                     is PokemonItem -> 1
-                    is GenerationItem -> 2
+                    is GenerationListItem -> 2
                 }
             }
         }
@@ -89,20 +89,20 @@ class PokemonRosterAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         }
     }
 
-    class GenerationViewHolder(view: View): RecyclerView.ViewHolder(view){
+    class GenerationListViewHolder(view: View): RecyclerView.ViewHolder(view){
 
-        private val generationNameView = itemView.findViewById<TextView>(R.id.generationName)
+        private val generationRecyclerView = itemView.findViewById<RecyclerView>(R.id.generation_list)
 
-        fun bind(item: GenerationItem){
-            generationNameView.text = item.generationText
+        fun bind(item: GenerationListItem){
+            generationRecyclerView.adapter = item.adapter
         }
 
         companion object {
-            fun from(parent: ViewGroup): GenerationViewHolder {
+            fun from(parent: ViewGroup): GenerationListViewHolder {
                 val view = LayoutInflater.from(parent.context)
-                        .inflate(R.layout.generation_item, parent, false)
+                        .inflate(R.layout.generation_list_item, parent, false)
 
-                return GenerationViewHolder(view)
+                return GenerationListViewHolder(view)
             }
         }
     }

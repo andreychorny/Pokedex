@@ -1,5 +1,7 @@
 package com.example.pokedex.presentation.adapter
 
+import com.example.pokedex.domain.GenerationEntity
+
 sealed class RosterItem
 
 class PokemonItem(
@@ -9,6 +11,6 @@ class PokemonItem(
         val generation: Int
 ) : RosterItem()
 
-class GenerationItem(
-        val generationText: String
+class GenerationListItem(
+        val adapter: GenerationListAdapter
 ) : RosterItem()

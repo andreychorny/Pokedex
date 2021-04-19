@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Pokedex</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="all_menu">All</string>
+    <string name="generation_menu">By generation</string>
+    <string name="type_menu">By type</string>
+    <string name="generations">Generations:</string>
 </resources>
