@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.pokedex.data.MockPokemonRepository
 import com.example.pokedex.data.NetworkPokemonRepository
 import com.example.pokedex.data.network.PokemonRosterApi
 import com.example.pokedex.domain.PokemonEntity
@@ -26,7 +25,7 @@ class PokemonRosterViewModel: ViewModel() {
     fun loadData(){
         viewModelScope.launch {
             val pokemons = repository.getPokemonList()
-            val pokemonWithBiggestGeneration = pokemons.maxWith(Comparator{a,b -> a.generation - b.generation})
+            val pokemonWithBiggestGeneration = pokemons.maxWithOrNull { a, b -> a.generation - b.generation }
             val maxGeneration = pokemonWithBiggestGeneration?.generation
             val resultList = mutableListOf<RosterItem>()
             for(i in 1..maxGeneration!!){
