@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pokedex.R
 import com.example.pokedex.domain.GenerationEntity
@@ -57,7 +56,3 @@ class GenerationListAdapter(private val onClickListener: OnClickListener):
     }
 
 }
-
-class GenerationItem(
-    val generationText: String
-)
