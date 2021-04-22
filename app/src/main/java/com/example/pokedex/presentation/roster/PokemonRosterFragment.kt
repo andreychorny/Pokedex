@@ -15,9 +15,8 @@ class PokemonRosterFragment : Fragment() {
     private val pokemonRosterViewModel = PokemonRosterViewModel()
     private var adapter = PokemonRosterAdapter(
         onItemClicked = { id: Long ->
-            val bundle = bundleOf("id" to id)
-            this.findNavController().navigate(R.id.action_pokemonRosterFragment_to_pokemonDetailFragment,
-                bundle)
+            this.findNavController().navigate(PokemonRosterFragmentDirections
+                .actionPokemonRosterFragmentToPokemonDetailFragment(id))
         }
     )
 
