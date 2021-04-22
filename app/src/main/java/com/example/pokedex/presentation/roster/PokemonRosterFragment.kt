@@ -1,9 +1,10 @@
-package com.example.pokedex.presentation
+package com.example.pokedex.presentation.roster
 
 import android.os.Bundle
 import android.view.*
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.databinding.DataBindingUtil
+import androidx.navigation.fragment.findNavController
 import com.example.pokedex.R
 import com.example.pokedex.data.network.PokemonApiFilter
 import com.example.pokedex.databinding.FragmentPokemonRosterBinding
@@ -12,18 +13,24 @@ import com.example.pokedex.presentation.adapter.PokemonRosterAdapter
 class PokemonRosterFragment : Fragment() {
 
     private val pokemonRosterViewModel = PokemonRosterViewModel()
-    private val adapter = PokemonRosterAdapter()
+    private var adapter = PokemonRosterAdapter(
+        onItemClicked = { id: Long ->
+            val bundle = bundleOf("id" to id)
+            this.findNavController().navigate(R.id.action_pokemonRosterFragment_to_pokemonDetailFragment,
+                bundle)
+        }
+    )
 
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val binding = FragmentPokemonRosterBinding.inflate(inflater)
         binding.lifecycleOwner = this
 
         binding.pokemonRoster.adapter = adapter
-        pokemonRosterViewModel.getPokemonList().observe(this, {pokemonList ->
+        pokemonRosterViewModel.getPokemonList().observe(viewLifecycleOwner, {pokemonList ->
             adapter.data = pokemonList
         })
 
@@ -46,5 +53,7 @@ class PokemonRosterFragment : Fragment() {
         )
         return true
     }
+
+
 
 }

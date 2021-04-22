@@ -10,4 +10,6 @@ interface PokemonRepository {
     ): List<PokemonEntity>
 
     suspend fun getGenerationsList(): List<GenerationEntity>
+
+    suspend fun getPokemonById(id: Long): PokemonDetailEntity
 }

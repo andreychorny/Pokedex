@@ -1,6 +1,5 @@
-package com.example.pokedex.presentation
+package com.example.pokedex.presentation.roster
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.pokedex.data.NetworkPokemonRepository
 import com.example.pokedex.data.network.PokemonApiFilter
 import com.example.pokedex.data.network.PokemonRosterApi
-import com.example.pokedex.domain.GenerationEntity
 import com.example.pokedex.domain.PokemonEntity
 import com.example.pokedex.domain.PokemonRepository
 import com.example.pokedex.presentation.adapter.*
@@ -53,5 +51,5 @@ class PokemonRosterViewModel: ViewModel() {
         loadData(filter)
     }
 
-    private fun PokemonEntity.toItem(): PokemonItem = PokemonItem(id, name, frontImgUrl, generation)
+    private fun PokemonEntity.toItem(): PokemonItem = PokemonItem(id, name, frontImgUrl)
 }

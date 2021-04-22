@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/navigation"
+    app:startDestination="@id/pokemonRosterFragment">
+
+    <fragment
+        android:id="@+id/pokemonRosterFragment"
+        android:name="com.example.pokedex.presentation.roster.PokemonRosterFragment"
+        android:label="PokemonRosterFragment" >
+        <action
+            android:id="@+id/action_pokemonRosterFragment_to_pokemonDetailFragment"
+            app:destination="@id/pokemonDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/pokemonDetailFragment"
+        android:name="com.example.pokedex.presentation.detail.PokemonDetailFragment"
+        android:label="PokemonDetailFragment" >
+        <argument
+            android:name="pokemonId"
+            app:argType="long" />
+    </fragment>
+</navigation>

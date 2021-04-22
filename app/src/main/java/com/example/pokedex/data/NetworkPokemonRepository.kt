@@ -3,9 +3,11 @@ package com.example.pokedex.data
 import com.example.pokedex.data.network.PokemonApiFilter
 import com.example.pokedex.data.network.PokemonRosterService
 import com.example.pokedex.domain.GenerationEntity
+import com.example.pokedex.domain.PokemonDetailEntity
 import com.example.pokedex.domain.PokemonEntity
 import com.example.pokedex.domain.PokemonRepository
-import com.example.pokedex.generatePicUrlFromId
+import com.example.pokedex.generateDreamWorldPicUrlFromId
+import com.example.pokedex.generateOfficialArtworkUrlFromId
 
 private val  RETRIEVE_ID_REGEX = "(\\d+)(?!.*\\d)".toRegex()
 
@@ -27,12 +29,26 @@ class NetworkPokemonRepository(val api: PokemonRosterService): PokemonRepository
         }
     }
 
+    override suspend fun getPokemonById(id: Long): PokemonDetailEntity {
+        val jsonPokemon = api.getPokemonDetails(id)
+        return PokemonDetailEntity(
+            jsonPokemon.id.toLong(),
+            jsonPokemon.name,
+            jsonPokemon.weight,
+            jsonPokemon.height,
+            jsonPokemon.stats.map{it.stat.name to it.base_stat}.toMap(),
+            jsonPokemon.types.map { it.type.name },
+            generateOfficialArtworkUrlFromId(jsonPokemon.id.toLong()),
+            generateDreamWorldPicUrlFromId(jsonPokemon.id.toLong())
+        )
+    }
+
     private suspend fun retrieveAllPokemon(): List<PokemonEntity>{
         return api.getAllPokemonRoster().results
             .filter { RETRIEVE_ID_REGEX.containsMatchIn(it.url) }
             .map {
                 val id = RETRIEVE_ID_REGEX.find(it.url)!!.value.toLong()
-                PokemonEntity(id, it.name, generatePicUrlFromId(id), 1) }
+                PokemonEntity(id, it.name, generateOfficialArtworkUrlFromId(id)) }
     }
 
     private suspend fun retrievePokemonByGeneration(generationId: Long): List<PokemonEntity>{
@@ -40,7 +56,7 @@ class NetworkPokemonRepository(val api: PokemonRosterService): PokemonRepository
             .filter { RETRIEVE_ID_REGEX.containsMatchIn(it.url) }
             .map {
                 val id = RETRIEVE_ID_REGEX.find(it.url)!!.value.toLong()
-                PokemonEntity(id, it.name, generatePicUrlFromId(id), 1) }
+                PokemonEntity(id, it.name, generateOfficialArtworkUrlFromId(id)) }
     }
 
     private suspend fun retrievePokemonByType(typeId: Long): List<PokemonEntity>{
@@ -49,6 +65,6 @@ class NetworkPokemonRepository(val api: PokemonRosterService): PokemonRepository
             .filter { RETRIEVE_ID_REGEX.containsMatchIn(it.url) }
             .map {
                 val id = RETRIEVE_ID_REGEX.find(it.url)!!.value.toLong()
-                PokemonEntity(id, it.name, generatePicUrlFromId(id), 1) }
+                PokemonEntity(id, it.name, generateOfficialArtworkUrlFromId(id)) }
     }
 }

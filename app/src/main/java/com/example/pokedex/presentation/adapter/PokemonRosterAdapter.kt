@@ -9,15 +9,19 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.pokedex.R
+import com.example.pokedex.domain.GenerationEntity
 import com.example.pokedex.domain.PokemonEntity
 import java.lang.IllegalStateException
 
 private const val ITEM_TYPE_POKEMON = 1
 private const val ITEM_TYPE_GENERATION_LIST = 2
-class PokemonRosterAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+class PokemonRosterAdapter(
+    private val onItemClicked: (id: Long) -> Unit
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     var data = listOf<RosterItem>()
-        set(value){
+        set(value) {
             field = value
             notifyDataSetChanged()
         }
@@ -25,8 +29,8 @@ class PokemonRosterAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun getItemCount(): Int = data.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return when(viewType){
-            ITEM_TYPE_POKEMON -> PokemonViewHolder.from(parent)
+        return when (viewType) {
+            ITEM_TYPE_POKEMON -> PokemonViewHolder.from(parent, onItemClicked)
             ITEM_TYPE_GENERATION_LIST -> GenerationListViewHolder.from(parent)
             else -> throw IllegalStateException()
         }
@@ -34,7 +38,7 @@ class PokemonRosterAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = data[position]
-        when(item){
+        when (item) {
             is PokemonItem -> {
                 (holder as PokemonViewHolder).bind(item)
             }
@@ -45,7 +49,7 @@ class PokemonRosterAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when(data[position]) {
+        return when (data[position]) {
             is PokemonItem -> ITEM_TYPE_POKEMON
             is GenerationListItem -> ITEM_TYPE_GENERATION_LIST
         }
@@ -67,40 +71,46 @@ class PokemonRosterAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         }
     }
 
-    class PokemonViewHolder(view: View): RecyclerView.ViewHolder(view){
+    class PokemonViewHolder(
+        view: View, val onItemClicked: (id: Long) -> Unit
+    ) : RecyclerView.ViewHolder(view) {
 
         private val nameView = itemView.findViewById<TextView>(R.id.pokemonName)
         private val imageView = itemView.findViewById<ImageView>(R.id.pokemonImage)
 
-        fun bind(item: PokemonItem){
+        fun bind(item: PokemonItem) {
             nameView.text = item.name
             Glide.with(imageView.context)
-                    .load(item.frontImgUrl)
-                    .into(imageView);
+                .load(item.frontImgUrl)
+                .into(imageView)
+            itemView.setOnClickListener {
+                onItemClicked(item.id)
+            }
         }
 
         companion object {
-            fun from(parent: ViewGroup): PokemonViewHolder {
+            fun from(parent: ViewGroup, onItemClicked: (id: Long) -> Unit ): PokemonViewHolder {
                 val view = LayoutInflater.from(parent.context)
-                        .inflate(R.layout.pokemon_item, parent, false)
+                    .inflate(R.layout.pokemon_item, parent, false)
 
-                return PokemonViewHolder(view)
+                return PokemonViewHolder(view, onItemClicked)
             }
         }
     }
 
-    class GenerationListViewHolder(view: View): RecyclerView.ViewHolder(view){
+    class GenerationListViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
-        private val generationRecyclerView = itemView.findViewById<RecyclerView>(R.id.generation_list)
+        private val generationRecyclerView =
+            itemView.findViewById<RecyclerView>(R.id.generation_list)
 
-        fun bind(item: GenerationListItem){
+        fun bind(item: GenerationListItem) {
             generationRecyclerView.adapter = item.adapter
         }
 
         companion object {
             fun from(parent: ViewGroup): GenerationListViewHolder {
                 val view = LayoutInflater.from(parent.context)
-                        .inflate(R.layout.generation_list_item, parent, false)
+                    .inflate(R.layout.generation_list_item, parent, false)
 
                 return GenerationListViewHolder(view)
             }

@@ -14,23 +14,23 @@ data class PokemonInRoster(
     val url: String
 )
 
-data class PokemonDetailResponse(
+data class PokemonDetailsResponse(
     val id: String,
     val name: String,
-    val abilities: List<PokemonAbilityData>
+    val weight: Int,
+    val height: Int,
+    val stats: List<PokemonStatsData>,
+    val types: List<PokemonTypesData>
 )
 
-data class PokemonAbilityDetailsData(
-    val name: String,
-    val url: String
-)
 
-data class PokemonAbilityData(
-    val ability: PokemonAbilityDetailsData,
-    val is_hidden: Boolean,
-    val slot: Int
+data class PokemonStatsData(
+    val stat: StatData,
+    val base_stat: Int
 )
-
+data class StatData(
+    val name: String
+)
 data class GenerationOfPokemonsResponse(
     val id: String,
     val name: String,
@@ -45,4 +45,11 @@ data class GenerationListResponse(
 data class GenerationInList(
     val name: String,
     val url: String
+)
+data class PokemonTypesData(
+    val slot: Int,
+    val type: TypesData
+)
+data class TypesData(
+    val name: String
 )

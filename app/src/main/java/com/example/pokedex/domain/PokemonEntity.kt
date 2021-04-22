@@ -4,5 +4,4 @@ data class PokemonEntity(
         val id: Long,
         val name: String,
         val frontImgUrl: String,
-        val generation: Int
 )

@@ -2,7 +2,6 @@ package com.example.pokedex.data
 
 import com.example.pokedex.domain.PokemonEntity
 import com.example.pokedex.domain.PokemonRepository
-import com.example.pokedex.generatePicUrlFromId
 
 //class MockPokemonRepository : PokemonRepository {
 //

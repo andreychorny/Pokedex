@@ -6,4 +6,6 @@
     <string name="generation_menu">By generation</string>
     <string name="type_menu">By type</string>
     <string name="generations">Generations:</string>
+    <string name="weight">Weight</string>
+    <string name="height">Height</string>
 </resources>

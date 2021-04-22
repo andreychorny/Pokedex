@@ -1,4 +1,7 @@
 package com.example.pokedex
 
-fun generatePicUrlFromId(id: Long): String =
+fun generateOfficialArtworkUrlFromId(id: Long): String =
     "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/$id.png"
+
+fun generateDreamWorldPicUrlFromId(id: Long): String =
+    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/$id.svg"
