@@ -1,22 +1,23 @@
 package com.example.pokedex.presentation.roster
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import android.app.Application
+import androidx.lifecycle.*
 import com.example.pokedex.data.NetworkPokemonRepository
 import com.example.pokedex.data.network.PokemonApiFilter
 import com.example.pokedex.data.network.PokemonRosterApi
+import com.example.pokedex.database.PokedexDatabase
 import com.example.pokedex.domain.PokemonEntity
 import com.example.pokedex.domain.PokemonRepository
 import com.example.pokedex.presentation.adapter.*
+import com.example.pokedex.presentation.detail.PokemonDetailViewModel
 import kotlinx.coroutines.launch
 
-class PokemonRosterViewModel: ViewModel() {
+class PokemonRosterViewModel(application: Application): AndroidViewModel(application) {
 
     private val _pokemonList = MutableLiveData<List<RosterItem>>()
     private val repository: PokemonRepository = NetworkPokemonRepository(
-        api = PokemonRosterApi.retrofitService
+        api = PokemonRosterApi.retrofitService,
+        database = PokedexDatabase.getInstance(application)
     )
     private var adapter: GenerationListAdapter
     //TODO: retrieve currentGenerationId minimal generation id from query of all generations
@@ -52,4 +53,15 @@ class PokemonRosterViewModel: ViewModel() {
     }
 
     private fun PokemonEntity.toItem(): PokemonItem = PokemonItem(id, name, frontImgUrl)
+
+    class Factory(val app: Application) : ViewModelProvider.Factory {
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(PokemonRosterViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return PokemonRosterViewModel(app) as T
+            }
+            throw IllegalArgumentException("Unable to construct viewmodel")
+        }
+    }
+
 }

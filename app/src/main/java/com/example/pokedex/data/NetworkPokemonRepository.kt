@@ -1,20 +1,25 @@
 package com.example.pokedex.data
 
-import com.example.pokedex.data.network.PokemonApiFilter
-import com.example.pokedex.data.network.PokemonRosterService
-import com.example.pokedex.domain.GenerationEntity
-import com.example.pokedex.domain.PokemonDetailEntity
-import com.example.pokedex.domain.PokemonEntity
-import com.example.pokedex.domain.PokemonRepository
-import com.example.pokedex.generateDreamWorldPicUrlFromId
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
+import com.example.pokedex.data.network.*
+import com.example.pokedex.database.PokedexDatabase
+import com.example.pokedex.database.entity.DatabasePokemonDetail
+import com.example.pokedex.database.entity.asDomainEntity
+import com.example.pokedex.domain.*
 import com.example.pokedex.generateOfficialArtworkUrlFromId
 
 private val  RETRIEVE_ID_REGEX = "(\\d+)(?!.*\\d)".toRegex()
 
-class NetworkPokemonRepository(val api: PokemonRosterService): PokemonRepository {
+class NetworkPokemonRepository(
+    private val api: PokemonRosterService,
+    private val database: PokedexDatabase): PokemonRepository {
+
 
     override suspend fun getPokemonList(filter: PokemonApiFilter,
                                         generationId: Long, typeId: Long): List<PokemonEntity> {
+
         return when(filter){
             PokemonApiFilter.SHOW_ALL -> retrieveAllPokemon()
             PokemonApiFilter.SHOW_GENERATION -> retrievePokemonByGeneration(generationId)
@@ -29,19 +34,34 @@ class NetworkPokemonRepository(val api: PokemonRosterService): PokemonRepository
         }
     }
 
-    override suspend fun getPokemonById(id: Long): PokemonDetailEntity {
-        val jsonPokemon = api.getPokemonDetails(id)
-        return PokemonDetailEntity(
-            jsonPokemon.id.toLong(),
-            jsonPokemon.name,
-            jsonPokemon.weight,
-            jsonPokemon.height,
-            jsonPokemon.stats.map{it.stat.name to it.base_stat}.toMap(),
-            jsonPokemon.types.map { it.type.name },
-            generateOfficialArtworkUrlFromId(jsonPokemon.id.toLong()),
-            generateDreamWorldPicUrlFromId(jsonPokemon.id.toLong())
-        )
+    override suspend fun getPokemonById(id: Long): LiveData<PokemonDetailEntity> {
+
+        return Transformations.map(database.pokemonDao.getPokemonDetail(id)) {
+            it.asDomainEntity()
+        }
+
     }
+
+    override suspend fun insertPokemonDetail(id: Long) {
+
+        val oldIsLiked = database.pokemonDao.isPokemonLiked(id)
+        val jsonPokemon = api.getPokemonDetails(id)
+        val stats = jsonPokemon.stats.asDatabaseStat(jsonPokemon.id.toLong())
+        val types = jsonPokemon.types.asDatabaseType()
+        //if pokemon is in database - we need to enter old "IsLiked" state
+        val newPokemonDetail = jsonPokemon.asDatabaseEntity(
+            oldIsLiked ?: false
+        )
+        database.statDao.insert(stats)
+        database.typeDao.insert(types)
+        database.pokemonDao.insert(newPokemonDetail)
+
+    }
+
+    override suspend fun updatePokemonInDatabase(databasePokemonDetail: DatabasePokemonDetail) {
+        database.pokemonDao.update(databasePokemonDetail)
+    }
+
 
     private suspend fun retrieveAllPokemon(): List<PokemonEntity>{
         return api.getAllPokemonRoster().results
