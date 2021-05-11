@@ -7,30 +7,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     >
 
-    <TextView
-        android:id="@+id/generationNumber"
+    <HorizontalScrollView
+        android:id="@+id/chips"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="26sp"
-        android:text="@string/generations"
-        app:layout_constraintBottom_toTopOf="@+id/generation_list"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/generation_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clipToPadding="false"
-        android:padding="6dp"
-        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/generationNumber"
-        app:layout_constraintVertical_bias="1.0"
-        app:spanCount="4"
-        tools:itemCount="16"
-        tools:listitem="@layout/generation_item" />
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/generationList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/normal_spacing"
+            app:singleSelection="true" />
 
+    </HorizontalScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

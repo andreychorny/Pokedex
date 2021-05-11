@@ -11,13 +11,16 @@ import com.bumptech.glide.Glide
 import com.example.pokedex.R
 import com.example.pokedex.domain.GenerationEntity
 import com.example.pokedex.domain.PokemonEntity
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import java.lang.IllegalStateException
 
 private const val ITEM_TYPE_POKEMON = 1
 private const val ITEM_TYPE_GENERATION_LIST = 2
 
 class PokemonRosterAdapter(
-    private val onItemClicked: (id: Long) -> Unit
+    private val onPokemonItemClicked: (id: Long) -> Unit,
+    private val onGenerationItemClicked: (id: Long, isChecked: Boolean) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     var data = listOf<RosterItem>()
@@ -30,8 +33,8 @@ class PokemonRosterAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            ITEM_TYPE_POKEMON -> PokemonViewHolder.from(parent, onItemClicked)
-            ITEM_TYPE_GENERATION_LIST -> GenerationListViewHolder.from(parent)
+            ITEM_TYPE_POKEMON -> PokemonViewHolder.from(parent, onPokemonItemClicked)
+            ITEM_TYPE_GENERATION_LIST -> GenerationListViewHolder.from(parent, onGenerationItemClicked)
             else -> throw IllegalStateException()
         }
     }
@@ -89,7 +92,7 @@ class PokemonRosterAdapter(
         }
 
         companion object {
-            fun from(parent: ViewGroup, onItemClicked: (id: Long) -> Unit ): PokemonViewHolder {
+            fun from(parent: ViewGroup, onItemClicked: (id: Long) -> Unit): PokemonViewHolder {
                 val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.pokemon_item, parent, false)
 
@@ -98,24 +101,42 @@ class PokemonRosterAdapter(
         }
     }
 
-    class GenerationListViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class GenerationListViewHolder(
+        view: View,
+        val onItemClicked: (id: Long, isChecked: Boolean) -> Unit
+    ) : RecyclerView.ViewHolder(view) {
 
-        private val generationRecyclerView =
-            itemView.findViewById<RecyclerView>(R.id.generation_list)
+        private val chipGroup =
+            itemView.findViewById<ChipGroup>(R.id.generationList)
 
+        //TODO fix showing checked Chip
         fun bind(item: GenerationListItem) {
-            generationRecyclerView.adapter = item.adapter
+            val inflator = LayoutInflater.from(chipGroup.context)
+            val children = item.generationList.map { generationId ->
+                val chip = inflator.inflate(R.layout.generation_item, chipGroup, false) as Chip
+                chip.text = generationId.toString()
+                chip.tag = generationId
+                chip.setOnCheckedChangeListener { button, isChecked ->
+                    onItemClicked(button.tag as Long, isChecked)
+                }
+                chip
+            }
+            chipGroup.removeAllViews()
+
+            for (chip in children) {
+                chipGroup.addView(chip)
+            }
         }
 
         companion object {
-            fun from(parent: ViewGroup): GenerationListViewHolder {
+            fun from(parent: ViewGroup,
+                     onItemClicked: (id: Long, isChecked: Boolean) -> Unit): GenerationListViewHolder {
                 val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.generation_list_item, parent, false)
 
-                return GenerationListViewHolder(view)
+                return GenerationListViewHolder(view, onItemClicked)
             }
         }
     }
-
-
 }
+

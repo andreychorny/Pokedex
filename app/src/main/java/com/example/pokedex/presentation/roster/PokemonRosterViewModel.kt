@@ -18,33 +18,38 @@ class PokemonRosterViewModel: ViewModel() {
     private val repository: PokemonRepository = NetworkPokemonRepository(
         api = PokemonRosterApi.retrofitService
     )
-    private var adapter: GenerationListAdapter
+//    private var adapter: GenerationListAdapter
     //TODO: retrieve currentGenerationId minimal generation id from query of all generations
     private var currentGenerationId: Long = 1
     private var currentTypeId: Long = 1
+
 
     fun getPokemonList(): LiveData<List<RosterItem>> = _pokemonList
 
     init{
         loadData(PokemonApiFilter.SHOW_ALL)
-        adapter = GenerationListAdapter(GenerationListAdapter.OnClickListener{
-            currentGenerationId = it.id
-            loadData(PokemonApiFilter.SHOW_GENERATION)
-        })
+//        adapter = GenerationListAdapter(GenerationListAdapter.OnClickListener{
+//            currentGenerationId = it.id
+//            loadData(PokemonApiFilter.SHOW_GENERATION)
+//        })
     }
 
     private fun loadData(filter: PokemonApiFilter){
         viewModelScope.launch {
             val resultList = mutableListOf<RosterItem>()
             if(filter == PokemonApiFilter.SHOW_GENERATION) {
-                resultList.add(GenerationListItem(adapter))
                 val generationList = repository.getGenerationsList()
-                adapter.data = generationList
+                resultList.add(GenerationListItem(generationList.map { it.id }))
             }
             val pokemons = repository.getPokemonList(filter, currentGenerationId, currentTypeId)
             resultList.addAll(pokemons.map { it.toItem() })
             _pokemonList.value = resultList
         }
+    }
+
+    fun updateGenerationId(id: Long){
+        currentGenerationId = id
+        loadData(PokemonApiFilter.SHOW_GENERATION)
     }
 
     fun updateFilter(filter: PokemonApiFilter) {
