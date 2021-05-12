@@ -105,20 +105,26 @@ class PokemonRosterAdapter(
         private val chipGroup =
             itemView.findViewById<ChipGroup>(R.id.generationList)
 
-        //TODO fix showing checked Chip
+        private var isFirstChip = true
+
         fun bind(item: GenerationListItem) {
             val inflator = LayoutInflater.from(chipGroup.context)
             val children = item.generationList.map { generationId ->
                 val chip = inflator.inflate(R.layout.generation_item, chipGroup, false) as Chip
-                chip.text = generationId.toString()
+                chip.text = "Generation ${generationId.toString()}"
                 chip.tag = generationId
+                if(isFirstChip){
+                    chip.isChecked = true
+                    isFirstChip = false
+                }
                 chip.setOnCheckedChangeListener { button, isChecked ->
-                    onItemClicked(button.tag as Long, isChecked)
+                    if(isChecked == true){
+                        onItemClicked(button.tag as Long, isChecked)
+                    }
                 }
                 chip
             }
             chipGroup.removeAllViews()
-
             for (chip in children) {
                 chipGroup.addView(chip)
             }
@@ -129,7 +135,6 @@ class PokemonRosterAdapter(
                      onItemClicked: (id: Long, isChecked: Boolean) -> Unit): GenerationListViewHolder {
                 val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.generation_list_item, parent, false)
-                Log.e("!!!!!!", "!!!!!!")
                 return GenerationListViewHolder(view, onItemClicked)
             }
         }
@@ -143,7 +148,7 @@ class PokemonRosterDiffUtil: DiffUtil.ItemCallback<RosterItem>() {
             return oldItem.id == newItem.id
         }
         if(oldItem is GenerationListItem && newItem is GenerationListItem){
-            return oldItem.generationList == newItem
+            return oldItem.generationList == newItem.generationList
         }
         return false
     }
@@ -153,7 +158,8 @@ class PokemonRosterDiffUtil: DiffUtil.ItemCallback<RosterItem>() {
             return oldItem == newItem
         }
         if(oldItem is GenerationListItem && newItem is GenerationListItem){
-            return oldItem.generationList == newItem
+
+            return oldItem.generationList == newItem.generationList
         }
         return false
     }
