@@ -1,11 +1,14 @@
 package com.example.pokedex.presentation.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.pokedex.R
@@ -21,15 +24,8 @@ private const val ITEM_TYPE_GENERATION_LIST = 2
 class PokemonRosterAdapter(
     private val onPokemonItemClicked: (id: Long) -> Unit,
     private val onGenerationItemClicked: (id: Long, isChecked: Boolean) -> Unit
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+) : ListAdapter<RosterItem, RecyclerView.ViewHolder>(PokemonRosterDiffUtil()) {
 
-    var data = listOf<RosterItem>()
-        set(value) {
-            field = value
-            notifyDataSetChanged()
-        }
-
-    override fun getItemCount(): Int = data.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
@@ -40,7 +36,7 @@ class PokemonRosterAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val item = data[position]
+        val item = getItem(position)
         when (item) {
             is PokemonItem -> {
                 (holder as PokemonViewHolder).bind(item)
@@ -52,7 +48,7 @@ class PokemonRosterAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (data[position]) {
+        return when (getItem(position)) {
             is PokemonItem -> ITEM_TYPE_POKEMON
             is GenerationListItem -> ITEM_TYPE_GENERATION_LIST
         }
@@ -66,7 +62,7 @@ class PokemonRosterAdapter(
     private fun getSpanSizeLookup(): GridLayoutManager.SpanSizeLookup {
         return object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return when (data[position]) {
+                return when (getItem(position)) {
                     is PokemonItem -> 1
                     is GenerationListItem -> 2
                 }
@@ -133,10 +129,32 @@ class PokemonRosterAdapter(
                      onItemClicked: (id: Long, isChecked: Boolean) -> Unit): GenerationListViewHolder {
                 val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.generation_list_item, parent, false)
-
+                Log.e("!!!!!!", "!!!!!!")
                 return GenerationListViewHolder(view, onItemClicked)
             }
         }
     }
 }
 
+class PokemonRosterDiffUtil: DiffUtil.ItemCallback<RosterItem>() {
+
+    override fun areItemsTheSame(oldItem: RosterItem, newItem: RosterItem): Boolean {
+        if(oldItem is PokemonItem && newItem is PokemonItem){
+            return oldItem.id == newItem.id
+        }
+        if(oldItem is GenerationListItem && newItem is GenerationListItem){
+            return oldItem.generationList == newItem
+        }
+        return false
+    }
+
+    override fun areContentsTheSame(oldItem: RosterItem, newItem: RosterItem): Boolean {
+        if(oldItem is PokemonItem && newItem is PokemonItem){
+            return oldItem == newItem
+        }
+        if(oldItem is GenerationListItem && newItem is GenerationListItem){
+            return oldItem.generationList == newItem
+        }
+        return false
+    }
+}

@@ -2,9 +2,11 @@ package com.example.pokedex.presentation.roster
 
 import android.os.Bundle
 import android.view.*
+import android.widget.ScrollView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.example.pokedex.R
 import com.example.pokedex.data.network.PokemonApiFilter
 import com.example.pokedex.databinding.FragmentPokemonRosterBinding
@@ -33,9 +35,30 @@ class PokemonRosterFragment : Fragment() {
 
         binding.pokemonRoster.adapter = adapter
         pokemonRosterViewModel.getPokemonList().observe(viewLifecycleOwner, {pokemonList ->
-            adapter.data = pokemonList
+            adapter.submitList(pokemonList)
         })
 
+        //scrolling screen to top after updates
+        adapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
+            override fun onChanged() {
+                binding.pokemonRoster.smoothScrollToPosition(0)
+            }
+            override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
+                binding.pokemonRoster.smoothScrollToPosition(0)
+            }
+            override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
+                binding.pokemonRoster.smoothScrollToPosition(0)
+            }
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                binding.pokemonRoster.smoothScrollToPosition(0)
+            }
+            override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
+                binding.pokemonRoster.smoothScrollToPosition(0)
+            }
+            override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) {
+                binding.pokemonRoster.smoothScrollToPosition(0)
+            }
+        })
         setHasOptionsMenu(true)
         return binding.root
     }
