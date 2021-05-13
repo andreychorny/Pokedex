@@ -35,9 +35,11 @@ interface PokemonRosterService {
     @GET("pokemon/{id}")
     suspend fun getPokemonDetails(@Path("id") id: Long): PokemonDetailsResponse
 
-    //TODO
-//    @GET("type/{id}")
-//    suspend fun getPokemonRosterByType(@Path("id") name: Long): PokemonListResponse
+    @GET("type")
+    suspend fun getAllTypes(): TypeListResponse
+
+    @GET("type/{id}")
+    suspend fun getPokemonRosterByType(@Path("id") name: Long): TypeOfPokemonsResponse
 
 }
 

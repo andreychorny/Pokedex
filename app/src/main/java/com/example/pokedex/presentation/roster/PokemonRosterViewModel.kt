@@ -19,8 +19,7 @@ class PokemonRosterViewModel: ViewModel() {
     private val repository: PokemonRepository = NetworkPokemonRepository(
         api = PokemonRosterApi.retrofitService
     )
-//    private var adapter: GenerationListAdapter
-    //TODO: retrieve currentGenerationId minimal generation id from query of all generations
+    //TODO: retrieve currentGenerationId as minimal generation id from query of all generations
     private var currentGenerationId: Long = 1
     private var currentTypeId: Long = 1
 
@@ -29,10 +28,6 @@ class PokemonRosterViewModel: ViewModel() {
 
     init{
         loadData(PokemonApiFilter.SHOW_ALL)
-//        adapter = GenerationListAdapter(GenerationListAdapter.OnClickListener{
-//            currentGenerationId = it.id
-//            loadData(PokemonApiFilter.SHOW_GENERATION)
-//        })
     }
 
     private fun loadData(filter: PokemonApiFilter){
@@ -41,6 +36,15 @@ class PokemonRosterViewModel: ViewModel() {
             if(filter == PokemonApiFilter.SHOW_GENERATION) {
                 val generationList = repository.getGenerationsList()
                 resultList.add(GenerationListItem(generationList.map { it.id }))
+            }
+            if(filter == PokemonApiFilter.SHOW_TYPE) {
+                val typeList = repository.getTypesList()
+                resultList.add(TypeListItem(typeList
+                    //backend contains empty dummy types with no pokemons. Those types are secluded
+                    //by having much higher id than normal (currently it's 10001 and 10002)
+                    //so here we need to remove them
+                    .filter { it.id < 1000 }
+                    .map { it.id to it.name }.toMap()))
             }
             val pokemons = repository.getPokemonList(filter, currentGenerationId, currentTypeId)
             resultList.addAll(pokemons.map { it.toItem() })
@@ -53,7 +57,15 @@ class PokemonRosterViewModel: ViewModel() {
         loadData(PokemonApiFilter.SHOW_GENERATION)
     }
 
+
+    fun updateTypeId(id: Long){
+        currentTypeId = id
+        loadData(PokemonApiFilter.SHOW_TYPE)
+    }
+
     fun updateFilter(filter: PokemonApiFilter) {
+        currentGenerationId = 1
+        currentTypeId = 1
         loadData(filter)
     }
 

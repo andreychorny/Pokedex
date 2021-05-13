@@ -22,6 +22,9 @@ class PokemonRosterFragment : Fragment() {
         },
         onGenerationItemClicked = { id: Long, isChecked: Boolean ->
             pokemonRosterViewModel.updateGenerationId(id)
+        },
+        onTypeItemClicked = {id: Long, isChecked: Boolean ->
+            pokemonRosterViewModel.updateTypeId(id)
         }
     )
 

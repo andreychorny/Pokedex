@@ -46,10 +46,30 @@ data class GenerationInList(
     val name: String,
     val url: String
 )
+
 data class PokemonTypesData(
     val slot: Int,
     val type: TypesData
 )
 data class TypesData(
     val name: String
+)
+
+data class TypeOfPokemonsResponse(
+    val id: String,
+    val name: String,
+    @Json(name = "pokemon") val results: List<PokemonInType>
+)
+data class PokemonInType(
+    val pokemon: PokemonInRoster,
+    val slot: Int
+)
+data class TypeListResponse(
+    val count: Int,
+    val results: List<TypeInList>
+
+)
+data class TypeInList(
+    val name: String,
+    val url: String
 )

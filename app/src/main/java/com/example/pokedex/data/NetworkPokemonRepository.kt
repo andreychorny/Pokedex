@@ -2,10 +2,7 @@ package com.example.pokedex.data
 
 import com.example.pokedex.data.network.PokemonApiFilter
 import com.example.pokedex.data.network.PokemonRosterService
-import com.example.pokedex.domain.GenerationEntity
-import com.example.pokedex.domain.PokemonDetailEntity
-import com.example.pokedex.domain.PokemonEntity
-import com.example.pokedex.domain.PokemonRepository
+import com.example.pokedex.domain.*
 import com.example.pokedex.generateDreamWorldPicUrlFromId
 import com.example.pokedex.generateOfficialArtworkUrlFromId
 
@@ -24,11 +21,17 @@ class NetworkPokemonRepository(val api: PokemonRosterService): PokemonRepository
 
     override suspend fun getGenerationsList(): List<GenerationEntity> {
         return api.getAllGenerations().results.map {
-            val id = RETRIEVE_ID_REGEX.find(it.url)!!.value.toLong()
+            val id = RETRIEVE_ID_REGEX.find(it.url)?.value?.toLong() ?: 0
             GenerationEntity(id, it.name)
         }
     }
 
+    override suspend fun getTypesList(): List<TypeEntity> {
+        return api.getAllTypes().results.map {
+            val id = RETRIEVE_ID_REGEX.find(it.url)?.value?.toLong() ?: 0
+            TypeEntity(id, it.name)
+        }
+    }
     override suspend fun getPokemonById(id: Long): PokemonDetailEntity {
         val jsonPokemon = api.getPokemonDetails(id)
         return PokemonDetailEntity(
@@ -60,11 +63,10 @@ class NetworkPokemonRepository(val api: PokemonRosterService): PokemonRepository
     }
 
     private suspend fun retrievePokemonByType(typeId: Long): List<PokemonEntity>{
-        //TODO
-        return api.getAllPokemonRoster().results
-            .filter { RETRIEVE_ID_REGEX.containsMatchIn(it.url) }
+        return api.getPokemonRosterByType(typeId).results
+            .filter { RETRIEVE_ID_REGEX.containsMatchIn(it.pokemon.url) }
             .map {
-                val id = RETRIEVE_ID_REGEX.find(it.url)!!.value.toLong()
-                PokemonEntity(id, it.name, generateOfficialArtworkUrlFromId(id)) }
+                val id = RETRIEVE_ID_REGEX.find(it.pokemon.url)!!.value.toLong()
+                PokemonEntity(id, it.pokemon.name, generateOfficialArtworkUrlFromId(id)) }
     }
 }
