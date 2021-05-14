@@ -2,10 +2,7 @@ package com.example.pokedex.presentation.roster
 
 import android.os.Bundle
 import android.view.*
-import android.widget.ScrollView
 import android.widget.Toast
-import androidx.annotation.NonNull
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
@@ -15,10 +12,11 @@ import com.example.pokedex.databinding.FragmentPokemonRosterBinding
 import com.example.pokedex.presentation.adapter.PokemonRosterAdapter
 import com.example.pokedex.presentation.adapter.RosterItem
 import com.google.android.material.snackbar.Snackbar
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PokemonRosterFragment : Fragment() {
 
-    private val pokemonRosterViewModel = PokemonRosterViewModel()
+    private val pokemonRosterViewModel: PokemonRosterViewModel by viewModel()
     private var adapter: PokemonRosterAdapter? = null
 
 

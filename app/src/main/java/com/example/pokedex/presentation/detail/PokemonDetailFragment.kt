@@ -5,28 +5,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.annotation.NonNull
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.pokedex.databinding.FragmentPokemonDetailBinding
 import com.example.pokedex.domain.PokemonDetailEntity
-import com.example.pokedex.presentation.adapter.RosterItem
-import com.example.pokedex.presentation.roster.PokemonRosterViewState
 import com.google.android.material.snackbar.Snackbar
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PokemonDetailFragment: Fragment() {
 
-    private var pokemonDetailViewModel: PokemonDetailViewModel? = null
+    private val pokemonDetailViewModel: PokemonDetailViewModel by viewModel()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
 
         val args = PokemonDetailFragmentArgs.fromBundle(requireArguments())
-        pokemonDetailViewModel = PokemonDetailViewModel()
         val binding = FragmentPokemonDetailBinding.inflate(inflater)
         binding.lifecycleOwner = this
-        pokemonDetailViewModel = PokemonDetailViewModel()
-        pokemonDetailViewModel!!.viewState().observe(viewLifecycleOwner, {state ->
+        pokemonDetailViewModel.viewState().observe(viewLifecycleOwner, {state ->
             when (state) {
                 is PokemonDetailViewState.Loading -> {
                     showProgress()
@@ -40,7 +36,7 @@ class PokemonDetailFragment: Fragment() {
             }
         })
 
-        pokemonDetailViewModel!!.loadDetail(args.pokemonId)
+        pokemonDetailViewModel.loadDetail(args.pokemonId)
         return binding.root
     }
 
@@ -67,7 +63,7 @@ class PokemonDetailFragment: Fragment() {
         errorMessage: String) {
         Snackbar.make(binding.detailCoordinator, errorMessage, Snackbar.LENGTH_INDEFINITE)
             .setAction("Retry") {
-                pokemonDetailViewModel?.loadDetail(id)
+                pokemonDetailViewModel.loadDetail(id)
             }
             .show()
 

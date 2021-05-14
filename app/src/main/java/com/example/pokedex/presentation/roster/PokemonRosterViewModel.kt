@@ -1,24 +1,17 @@
 package com.example.pokedex.presentation.roster
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.pokedex.data.NetworkPokemonRepository
 import com.example.pokedex.data.network.PokemonApiFilter
-import com.example.pokedex.data.network.PokemonRosterApi
 import com.example.pokedex.domain.PokemonEntity
 import com.example.pokedex.domain.PokemonRepository
 import com.example.pokedex.presentation.adapter.*
 import kotlinx.coroutines.launch
 import java.lang.Exception
 
-class PokemonRosterViewModel : ViewModel() {
-
-    private val repository: PokemonRepository = NetworkPokemonRepository(
-        api = PokemonRosterApi.retrofitService
-    )
+class PokemonRosterViewModel (private val repository: PokemonRepository) : ViewModel() {
 
     private val viewStateLiveData = MutableLiveData<PokemonRosterViewState>()
     fun viewState(): LiveData<PokemonRosterViewState> = viewStateLiveData
