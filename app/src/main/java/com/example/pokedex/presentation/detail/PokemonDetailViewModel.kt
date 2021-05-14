@@ -6,15 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pokedex.data.NetworkPokemonRepository
 import com.example.pokedex.data.network.PokemonRosterApi
-import com.example.pokedex.domain.PokemonDetailEntity
 import com.example.pokedex.domain.PokemonRepository
 import kotlinx.coroutines.launch
 
 class PokemonDetailViewModel: ViewModel() {
 
-    private val _pokemonDetail = MutableLiveData<PokemonDetailEntity>()
-
-    fun getPokemonDetail(): LiveData<PokemonDetailEntity> = _pokemonDetail
+    private val viewStateLiveData = MutableLiveData<PokemonDetailViewState>()
+    fun viewState(): LiveData<PokemonDetailViewState> = viewStateLiveData
 
 
     private val repository: PokemonRepository = NetworkPokemonRepository(
@@ -22,8 +20,13 @@ class PokemonDetailViewModel: ViewModel() {
     )
 
     fun loadDetail(id: Long){
+        viewStateLiveData.value = PokemonDetailViewState.Loading
         viewModelScope.launch {
-            _pokemonDetail.value = repository.getPokemonById(id)
+            try {
+                viewStateLiveData.value = PokemonDetailViewState.Data(repository.getPokemonById(id))
+            }catch (e: Exception){
+                viewStateLiveData.value = PokemonDetailViewState.Error("Loading failed, no internet connection")
+            }
         }
     }
 

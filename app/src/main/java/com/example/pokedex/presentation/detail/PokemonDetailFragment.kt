@@ -4,11 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.NonNull
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.pokedex.databinding.FragmentPokemonDetailBinding
 import com.example.pokedex.domain.PokemonDetailEntity
+import com.example.pokedex.presentation.adapter.RosterItem
+import com.example.pokedex.presentation.roster.PokemonRosterViewState
+import com.google.android.material.snackbar.Snackbar
 
 class PokemonDetailFragment: Fragment() {
 
@@ -22,15 +26,25 @@ class PokemonDetailFragment: Fragment() {
         val binding = FragmentPokemonDetailBinding.inflate(inflater)
         binding.lifecycleOwner = this
         pokemonDetailViewModel = PokemonDetailViewModel()
-        pokemonDetailViewModel!!.getPokemonDetail().observe(viewLifecycleOwner, { pokemonDetail: PokemonDetailEntity ->
-            bind(binding, pokemonDetail)
-
+        pokemonDetailViewModel!!.viewState().observe(viewLifecycleOwner, {state ->
+            when (state) {
+                is PokemonDetailViewState.Loading -> {
+                    showProgress()
+                }
+                is PokemonDetailViewState.Data -> {
+                    showData(binding, state.detail)
+                }
+                is PokemonDetailViewState.Error -> {
+                    showError(binding, args.pokemonId, state.message)
+                }
+            }
         })
+
         pokemonDetailViewModel!!.loadDetail(args.pokemonId)
         return binding.root
     }
 
-    private fun bind(
+    private fun showData(
         binding: FragmentPokemonDetailBinding,
         pokemonDetail: PokemonDetailEntity
     ) {
@@ -40,6 +54,23 @@ class PokemonDetailFragment: Fragment() {
         Glide.with(binding.pokemonDetailImg.context)
             .load(pokemonDetail.officialArtworkUrl)
             .into(binding.pokemonDetailImg)
+    }
+
+
+    private fun showProgress() {
+        Toast.makeText(context, "Loading", Toast.LENGTH_LONG).show()
+    }
+
+    private fun showError(
+        binding: FragmentPokemonDetailBinding,
+        id: Long,
+        errorMessage: String) {
+        Snackbar.make(binding.detailCoordinator, errorMessage, Snackbar.LENGTH_INDEFINITE)
+            .setAction("Retry") {
+                pokemonDetailViewModel?.loadDetail(id)
+            }
+            .show()
+
     }
 
 }
