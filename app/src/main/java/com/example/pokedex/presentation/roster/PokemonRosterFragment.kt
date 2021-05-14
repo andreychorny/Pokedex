@@ -3,6 +3,7 @@ package com.example.pokedex.presentation.roster
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
@@ -34,10 +35,10 @@ class PokemonRosterFragment : Fragment() {
         pokemonRosterViewModel.viewState().observe(viewLifecycleOwner) { state ->
             when (state) {
                 is PokemonRosterViewState.Loading -> {
-                    showProgress()
+                    showProgress(binding)
                 }
                 is PokemonRosterViewState.Data -> {
-                    showData(state.items)
+                    showData(binding, state.items)
                 }
                 is PokemonRosterViewState.Error -> {
                     showError(binding, state)
@@ -113,11 +114,15 @@ class PokemonRosterFragment : Fragment() {
         )
     }
 
-    private fun showProgress() {
+    private fun showProgress( binding: FragmentPokemonRosterBinding) {
+        binding.rosterProgressBar.isVisible = true
+        binding.rosterViewGroup.isVisible = false
         Toast.makeText(context, "Loading", Toast.LENGTH_LONG).show()
     }
 
-    private fun showData(items: List<RosterItem>) {
+    private fun showData( binding: FragmentPokemonRosterBinding, items: List<RosterItem>) {
+        binding.rosterProgressBar.isVisible = false
+        binding.rosterViewGroup.isVisible = true
         adapter?.submitList(items)
     }
 
@@ -125,6 +130,8 @@ class PokemonRosterFragment : Fragment() {
         binding: FragmentPokemonRosterBinding,
         state: PokemonRosterViewState.Error
     ) {
+        binding.rosterProgressBar.isVisible = false
+        binding.rosterViewGroup.isVisible = false
         Snackbar.make(binding.rosterCoordinator, state.message, Snackbar.LENGTH_INDEFINITE)
             .setAction("Retry") {
                 pokemonRosterViewModel.loadData()

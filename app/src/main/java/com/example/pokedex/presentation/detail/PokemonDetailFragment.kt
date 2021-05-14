@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.pokedex.databinding.FragmentPokemonDetailBinding
@@ -25,7 +26,7 @@ class PokemonDetailFragment: Fragment() {
         pokemonDetailViewModel.viewState().observe(viewLifecycleOwner, {state ->
             when (state) {
                 is PokemonDetailViewState.Loading -> {
-                    showProgress()
+                    showProgress(binding)
                 }
                 is PokemonDetailViewState.Data -> {
                     showData(binding, state.detail)
@@ -44,6 +45,9 @@ class PokemonDetailFragment: Fragment() {
         binding: FragmentPokemonDetailBinding,
         pokemonDetail: PokemonDetailEntity
     ) {
+        binding.detailProgressBar.isVisible = false
+        binding.detailViewGroup.isVisible = true
+
         binding.pokemonDetailName.text = pokemonDetail.name
         binding.pokemonHeight.text = pokemonDetail.height.toString()
         binding.pokemonWeight.text = pokemonDetail.weight.toString()
@@ -53,14 +57,18 @@ class PokemonDetailFragment: Fragment() {
     }
 
 
-    private fun showProgress() {
-        Toast.makeText(context, "Loading", Toast.LENGTH_LONG).show()
+    private fun showProgress(binding: FragmentPokemonDetailBinding) {
+        binding.detailProgressBar.isVisible = true
+        binding.detailViewGroup.isVisible = false
     }
 
     private fun showError(
         binding: FragmentPokemonDetailBinding,
         id: Long,
         errorMessage: String) {
+        binding.detailProgressBar.isVisible = false
+        binding.detailViewGroup.isVisible = false
+
         Snackbar.make(binding.detailCoordinator, errorMessage, Snackbar.LENGTH_INDEFINITE)
             .setAction("Retry") {
                 pokemonDetailViewModel.loadDetail(id)
