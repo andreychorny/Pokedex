@@ -1,0 +1,47 @@
+package com.example.pokedex.presentation.adapter.item
+
+import android.view.LayoutInflater
+import com.example.pokedex.R
+import com.google.android.material.chip.Chip
+import com.xwray.groupie.GroupieViewHolder
+import com.xwray.groupie.Item
+import kotlinx.android.synthetic.main.type_list.view.*
+
+class TypeListItem(
+    private val typeMap: Map<Long,String>
+): Item<GroupieViewHolder>(), RosterItem {
+
+    private var isFirstChip = true
+
+    var onItemClicked: ((Long, Boolean) -> Unit)? = null
+
+    override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+        val chipGroup = viewHolder.itemView.typeList
+        val inflator = LayoutInflater.from(chipGroup.context)
+        val children = typeMap.map { (typeId: Long, typeName: String) ->
+            val chip = inflator.inflate(R.layout.type_item, chipGroup, false) as Chip
+            chip.text = typeName
+            chip.tag = typeId
+            if(isFirstChip){
+                chip.isChecked = true
+                isFirstChip = false
+            }
+            chip.setOnCheckedChangeListener { button, isChecked ->
+                if(isChecked){
+                    onItemClicked?.invoke(button.tag as Long, isChecked)
+                }
+            }
+            chip
+        }
+        chipGroup.removeAllViews()
+        for (chip in children) {
+            chipGroup.addView(chip)
+        }
+        isFirstChip = true
+
+    }
+
+    override fun getLayout(): Int = R.layout.type_list
+
+    override fun getSpanSize(spanCount: Int, position: Int): Int = 2
+}

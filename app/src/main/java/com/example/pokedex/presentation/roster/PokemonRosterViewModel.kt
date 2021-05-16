@@ -8,6 +8,10 @@ import com.example.pokedex.data.network.PokemonApiFilter
 import com.example.pokedex.domain.PokemonEntity
 import com.example.pokedex.domain.PokemonRepository
 import com.example.pokedex.presentation.adapter.*
+import com.example.pokedex.presentation.adapter.item.GenerationListItem
+import com.example.pokedex.presentation.adapter.item.PokemonItem
+import com.example.pokedex.presentation.adapter.item.RosterItem
+import com.example.pokedex.presentation.adapter.item.TypeListItem
 import kotlinx.coroutines.launch
 import java.lang.Exception
 
@@ -39,7 +43,8 @@ class PokemonRosterViewModel (private val repository: PokemonRepository) : ViewM
                 }
                 if (filter == PokemonApiFilter.SHOW_TYPE) {
                     val typeList = repository.getTypesList()
-                    resultList.add(TypeListItem(typeList
+                    resultList.add(
+                        TypeListItem(typeList
                         //backend contains empty dummy types with no pokemons. Those types are secluded
                         //by having much higher id than normal (currently it's 10001 and 10002)
                         //so here we need to remove them

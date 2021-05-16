@@ -1,6 +1,7 @@
 package com.example.pokedex.presentation.roster
 
-import com.example.pokedex.presentation.adapter.RosterItem
+import com.example.pokedex.presentation.adapter.item.RosterItem
+
 
 sealed class PokemonRosterViewState {
 

@@ -10,16 +10,20 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.pokedex.R
 import com.example.pokedex.data.network.PokemonApiFilter
 import com.example.pokedex.databinding.FragmentPokemonRosterBinding
-import com.example.pokedex.presentation.adapter.PokemonRosterAdapter
-import com.example.pokedex.presentation.adapter.RosterItem
+import com.example.pokedex.presentation.adapter.item.GenerationListItem
+import com.example.pokedex.presentation.adapter.item.PokemonItem
+import com.example.pokedex.presentation.adapter.item.RosterItem
+import com.example.pokedex.presentation.adapter.item.TypeListItem
 import com.google.android.material.snackbar.Snackbar
+import com.xwray.groupie.GroupAdapter
+import com.xwray.groupie.GroupieViewHolder
+import com.xwray.groupie.Section
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PokemonRosterFragment : Fragment() {
 
     private val pokemonRosterViewModel: PokemonRosterViewModel by viewModel()
-    private var adapter: PokemonRosterAdapter? = null
-
+    private val adapter = GroupAdapter<GroupieViewHolder>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,8 +31,6 @@ class PokemonRosterFragment : Fragment() {
     ): View {
         val binding = FragmentPokemonRosterBinding.inflate(inflater)
         binding.lifecycleOwner = this
-
-        initRecyclerView()
 
         binding.pokemonRoster.adapter = adapter
 
@@ -97,33 +99,25 @@ class PokemonRosterFragment : Fragment() {
         return true
     }
 
-    private fun initRecyclerView(){
-        adapter = PokemonRosterAdapter(
-            onPokemonItemClicked = { id: Long ->
-                this.findNavController().navigate(
-                    PokemonRosterFragmentDirections
-                        .actionPokemonRosterFragmentToPokemonDetailFragment(id)
-                )
-            },
-            onGenerationItemClicked = { id: Long, isChecked: Boolean ->
-                pokemonRosterViewModel.updateGenerationId(id)
-            },
-            onTypeItemClicked = { id: Long, isChecked: Boolean ->
-                pokemonRosterViewModel.updateTypeId(id)
-            }
-        )
-    }
-
     private fun showProgress( binding: FragmentPokemonRosterBinding) {
         binding.rosterProgressBar.isVisible = true
         binding.rosterViewGroup.isVisible = false
-        Toast.makeText(context, "Loading", Toast.LENGTH_LONG).show()
     }
 
+    //TODO fix span size and refreshing(diffutil) content. Maybe should use Section with header
     private fun showData( binding: FragmentPokemonRosterBinding, items: List<RosterItem>) {
         binding.rosterProgressBar.isVisible = false
         binding.rosterViewGroup.isVisible = true
-        adapter?.submitList(items)
+        items.forEach{
+            setOnClickListener(it)
+        }
+        adapter.clear()
+        adapter.addAll(items.filterIsInstance<GenerationListItem>().map { it as GenerationListItem })
+        adapter.addAll(items.filterIsInstance<TypeListItem>().map { it as TypeListItem })
+        adapter.addAll(items.filterIsInstance<PokemonItem>().map{it as PokemonItem})
+        adapter.spanSizeLookup
+
+
     }
 
     private fun showError(
@@ -139,4 +133,21 @@ class PokemonRosterFragment : Fragment() {
             .show()
     }
 
+    private fun setOnClickListener(item: RosterItem){
+        when(item){
+            is PokemonItem -> item.onItemClicked = { id: Long ->
+                this.findNavController().navigate(
+                    PokemonRosterFragmentDirections
+                        .actionPokemonRosterFragmentToPokemonDetailFragment(id)
+                )
+            }
+            is GenerationListItem -> item.onItemClicked = { id: Long, isChecked: Boolean ->
+                pokemonRosterViewModel.updateGenerationId(id)
+            }
+            is TypeListItem -> item.onItemClicked =  { id: Long, isChecked: Boolean ->
+                pokemonRosterViewModel.updateTypeId(id)
+            }
+        }
+
+    }
 }
