@@ -1,26 +1,31 @@
 package com.example.pokedex.data
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.example.pokedex.data.network.*
 import com.example.pokedex.database.PokedexDatabase
-import com.example.pokedex.database.entity.DatabasePokemonDetail
+import com.example.pokedex.database.entity.DbPokemonDetail
+import com.example.pokedex.database.entity.PokemonTypeCrossRef
 import com.example.pokedex.database.entity.asDomainEntity
 import com.example.pokedex.domain.*
 import com.example.pokedex.generateOfficialArtworkUrlFromId
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-private val  RETRIEVE_ID_REGEX = "(\\d+)(?!.*\\d)".toRegex()
+private val RETRIEVE_ID_REGEX = "(\\d+)(?!.*\\d)".toRegex()
 
 class NetworkPokemonRepository(
     private val api: PokemonRosterService,
-    private val database: PokedexDatabase): PokemonRepository {
+    private val database: PokedexDatabase
+) : PokemonRepository {
 
 
-    override suspend fun getPokemonList(filter: PokemonApiFilter,
-                                        generationId: Long, typeId: Long): List<PokemonEntity> {
+    override suspend fun getPokemonList(
+        filter: PokemonApiFilter,
+        generationId: Long, typeId: Long
+    ): List<PokemonEntity> {
 
-        return when(filter){
+        return when (filter) {
             PokemonApiFilter.SHOW_ALL -> retrieveAllPokemon()
             PokemonApiFilter.SHOW_GENERATION -> retrievePokemonByGeneration(generationId)
             PokemonApiFilter.SHOW_TYPE -> retrievePokemonByType(typeId)
@@ -34,15 +39,15 @@ class NetworkPokemonRepository(
         }
     }
 
+
     override suspend fun getPokemonById(id: Long): LiveData<PokemonDetailEntity> {
 
         return Transformations.map(database.pokemonDao.getPokemonDetail(id)) {
-            it.asDomainEntity()
+            it?.asDomainEntity()
         }
-
     }
 
-    override suspend fun insertPokemonDetail(id: Long) {
+    override suspend fun downloadPokemonDetail(id: Long) {
 
         val oldIsLiked = database.pokemonDao.isPokemonLiked(id)
         val jsonPokemon = api.getPokemonDetails(id)
@@ -54,37 +59,57 @@ class NetworkPokemonRepository(
         )
         database.statDao.insert(stats)
         database.typeDao.insert(types)
-        database.pokemonDao.insert(newPokemonDetail)
+        val pokemonToTypeList = mutableListOf<PokemonTypeCrossRef>()
+        for(type in types) {
+            pokemonToTypeList.add(PokemonTypeCrossRef(id, type.name))
+        }
+        database.pokemonDao.insertPokemonToTypes(pokemonToTypeList)
+        database.pokemonDao.insertDetail(newPokemonDetail)
 
     }
 
-    override suspend fun updatePokemonInDatabase(databasePokemonDetail: DatabasePokemonDetail) {
-        database.pokemonDao.update(databasePokemonDetail)
+    override suspend fun updatePokemonInDatabase(dbPokemonDetail: DbPokemonDetail) {
+        database.pokemonDao.update(dbPokemonDetail)
     }
 
 
-    private suspend fun retrieveAllPokemon(): List<PokemonEntity>{
+    private suspend fun retrieveAllPokemon(): List<PokemonEntity> {
+        var pokemons = listOf<PokemonEntity>()
+        withContext(Dispatchers.IO) {
+            pokemons = database.pokemonDao.getPokemonList().map { it.asDomainEntity() }
+            if (pokemons.isEmpty()) {
+                pokemons = downloadAllPokemon()
+                database.pokemonDao.insertBaseInfoList(pokemons.map { it.asDatabaseEntity() })
+            }
+        }
+        return pokemons
+    }
+
+    private suspend fun downloadAllPokemon(): List<PokemonEntity> {
         return api.getAllPokemonRoster().results
             .filter { RETRIEVE_ID_REGEX.containsMatchIn(it.url) }
             .map {
                 val id = RETRIEVE_ID_REGEX.find(it.url)!!.value.toLong()
-                PokemonEntity(id, it.name, generateOfficialArtworkUrlFromId(id)) }
+                PokemonEntity(id, it.name, generateOfficialArtworkUrlFromId(id))
+            }
     }
 
-    private suspend fun retrievePokemonByGeneration(generationId: Long): List<PokemonEntity>{
+    private suspend fun retrievePokemonByGeneration(generationId: Long): List<PokemonEntity> {
         return api.getPokemonRosterByGeneration(generationId).results
             .filter { RETRIEVE_ID_REGEX.containsMatchIn(it.url) }
             .map {
                 val id = RETRIEVE_ID_REGEX.find(it.url)!!.value.toLong()
-                PokemonEntity(id, it.name, generateOfficialArtworkUrlFromId(id)) }
+                PokemonEntity(id, it.name, generateOfficialArtworkUrlFromId(id))
+            }
     }
 
-    private suspend fun retrievePokemonByType(typeId: Long): List<PokemonEntity>{
+    private suspend fun retrievePokemonByType(typeId: Long): List<PokemonEntity> {
         //TODO
         return api.getAllPokemonRoster().results
             .filter { RETRIEVE_ID_REGEX.containsMatchIn(it.url) }
             .map {
                 val id = RETRIEVE_ID_REGEX.find(it.url)!!.value.toLong()
-                PokemonEntity(id, it.name, generateOfficialArtworkUrlFromId(id)) }
+                PokemonEntity(id, it.name, generateOfficialArtworkUrlFromId(id))
+            }
     }
 }

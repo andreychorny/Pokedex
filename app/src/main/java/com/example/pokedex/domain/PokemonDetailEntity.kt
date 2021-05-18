@@ -1,9 +1,8 @@
 package com.example.pokedex.domain
 
-import com.example.pokedex.database.entity.DatabasePokemonDetail
-import com.example.pokedex.database.entity.DatabaseStat
-import com.example.pokedex.database.entity.DatabaseType
-import com.example.pokedex.database.entity.FullDatabasePokemonDetail
+import com.example.pokedex.database.entity.DbPokemonDetail
+import com.example.pokedex.database.entity.DbStat
+import com.example.pokedex.database.entity.DbType
 
 data class PokemonDetailEntity(
     val id: Long,
@@ -17,8 +16,8 @@ data class PokemonDetailEntity(
     val isLiked: Boolean
 )
 
-fun PokemonDetailEntity.asDatabaseEntity(isLiked: Boolean = false): DatabasePokemonDetail {
-    return DatabasePokemonDetail(
+fun PokemonDetailEntity.asDatabaseEntity(isLiked: Boolean = false): DbPokemonDetail {
+    return DbPokemonDetail(
         pokemonId = id,
         name = name,
         weight = weight,
@@ -29,10 +28,10 @@ fun PokemonDetailEntity.asDatabaseEntity(isLiked: Boolean = false): DatabasePoke
     )
 }
 
-fun Map<String, Int>.asDatabaseStat(pokemonId: Long): List<DatabaseStat> {
-    return map { DatabaseStat(pokemonId, it.key, it.value) }
+fun Map<String, Int>.asDatabaseStat(pokemonId: Long): List<DbStat> {
+    return map { DbStat(pokemonId, it.key, it.value) }
 }
 
-fun List<String>.asDatabaseType(): List<DatabaseType> {
-    return map { DatabaseType(name = it) }
+fun List<String>.asDatabaseType(): List<DbType> {
+    return map { DbType(name = it) }
 }

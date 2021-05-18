@@ -1,8 +1,8 @@
 package com.example.pokedex.data.network
 
-import com.example.pokedex.database.entity.DatabasePokemonDetail
-import com.example.pokedex.database.entity.DatabaseStat
-import com.example.pokedex.database.entity.DatabaseType
+import com.example.pokedex.database.entity.DbPokemonDetail
+import com.example.pokedex.database.entity.DbStat
+import com.example.pokedex.database.entity.DbType
 import com.example.pokedex.domain.PokemonDetailEntity
 import com.example.pokedex.generateDreamWorldPicUrlFromId
 import com.example.pokedex.generateOfficialArtworkUrlFromId
@@ -45,8 +45,8 @@ fun PokemonDetailsResponse.asDomainEntity(): PokemonDetailEntity {
 
 fun PokemonDetailsResponse.asDatabaseEntity(
     isLiked: Boolean = false
-): DatabasePokemonDetail {
-    return DatabasePokemonDetail(
+): DbPokemonDetail {
+    return DbPokemonDetail(
         pokemonId = id.toLong(),
         name = name,
         weight = weight,
@@ -61,10 +61,10 @@ data class PokemonStatsData(
     val stat: StatData,
     val base_stat: Int
 )
-fun PokemonStatsData.asDatabaseStat(pokemonId: Long): DatabaseStat{
-    return DatabaseStat(parentPokemonId = pokemonId, name = stat.name, value = base_stat)
+fun PokemonStatsData.asDatabaseStat(pokemonId: Long): DbStat{
+    return DbStat(parentPokemonId = pokemonId, name = stat.name, value = base_stat)
 }
-fun List<PokemonStatsData>.asDatabaseStat(pokemonId: Long): List<DatabaseStat>{
+fun List<PokemonStatsData>.asDatabaseStat(pokemonId: Long): List<DbStat>{
     return map { it.asDatabaseStat(pokemonId) }
 }
 
@@ -97,9 +97,9 @@ data class PokemonTypesData(
 data class TypesData(
     val name: String
 )
-fun PokemonTypesData.asDatabaseType(): DatabaseType{
-    return DatabaseType(type.name)
+fun PokemonTypesData.asDatabaseType(): DbType{
+    return DbType(type.name)
 }
-fun List<PokemonTypesData>.asDatabaseType(): List<DatabaseType>{
+fun List<PokemonTypesData>.asDatabaseType(): List<DbType>{
     return map { it.asDatabaseType() }
 }

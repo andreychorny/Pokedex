@@ -24,7 +24,6 @@ class PokemonDetailViewModel(application: Application) : AndroidViewModel(applic
     )
 
     fun loadDetail(id: Long): MediatorLiveData<PokemonDetailEntity> {
-        Log.w("BEFORE", "BEFORE")
         viewModelScope.launch {
             //TODO fix error of app shutdown if no pokemon in cache + no internet connection
             _pokemonDetail.addSource(repository.getPokemonById(id), Observer {
@@ -35,7 +34,7 @@ class PokemonDetailViewModel(application: Application) : AndroidViewModel(applic
             withContext(Dispatchers.IO) {
                 launch {
                     try {
-                        repository.insertPokemonDetail(id)
+                        repository.downloadPokemonDetail(id)
                     } catch (networkError: IOException) {
                         //TODO ErrorState indication
                     }

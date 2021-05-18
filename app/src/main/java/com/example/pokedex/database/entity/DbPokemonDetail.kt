@@ -7,7 +7,7 @@ import androidx.room.Relation
 import com.example.pokedex.domain.PokemonDetailEntity
 
 @Entity
-data class DatabasePokemonDetail(
+data class DbPokemonDetail(
     @PrimaryKey
     val pokemonId: Long,
     val name: String,

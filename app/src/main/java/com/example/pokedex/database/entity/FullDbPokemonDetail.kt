@@ -5,22 +5,22 @@ import androidx.room.Junction
 import androidx.room.Relation
 import com.example.pokedex.domain.PokemonDetailEntity
 
-data class FullDatabasePokemonDetail(
-    @Embedded val pokemonDetail: DatabasePokemonDetail,
+data class FullDbPokemonDetail(
+    @Embedded val pokemonDetail: DbPokemonDetail,
     @Relation(
         parentColumn = "pokemonId",
         entityColumn = "parentPokemonId"
     )
-    val stats: List<DatabaseStat>,
+    val stats: List<DbStat>,
     @Relation(
         parentColumn = "pokemonId",
         entityColumn = "name",
         associateBy = Junction(PokemonTypeCrossRef::class)
     )
-    val types: List<DatabaseType>
+    val types: List<DbType>
 )
 
-fun FullDatabasePokemonDetail.asDomainEntity(): PokemonDetailEntity {
+fun FullDbPokemonDetail.asDomainEntity(): PokemonDetailEntity {
     return PokemonDetailEntity(
         id = pokemonDetail.pokemonId,
         name = pokemonDetail.name,

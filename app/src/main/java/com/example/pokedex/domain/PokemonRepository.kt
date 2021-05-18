@@ -2,8 +2,7 @@ package com.example.pokedex.domain
 
 import androidx.lifecycle.LiveData
 import com.example.pokedex.data.network.PokemonApiFilter
-import com.example.pokedex.database.entity.DatabasePokemonDetail
-import com.example.pokedex.database.entity.FullDatabasePokemonDetail
+import com.example.pokedex.database.entity.DbPokemonDetail
 
 interface PokemonRepository {
 
@@ -16,7 +15,7 @@ interface PokemonRepository {
 
     suspend fun getPokemonById(id: Long): LiveData<PokemonDetailEntity>
 
-    suspend fun updatePokemonInDatabase(databasePokemonDetail: DatabasePokemonDetail)
+    suspend fun updatePokemonInDatabase(dbPokemonDetail: DbPokemonDetail)
 
-    suspend fun insertPokemonDetail(id: Long)
+    suspend fun downloadPokemonDetail(id: Long)
 }

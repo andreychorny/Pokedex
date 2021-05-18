@@ -51,6 +51,7 @@ class PokemonDetailFragment: Fragment() {
             pokemonDetailViewModel.updateLiked()
             updateLikeImg(binding, pokemonDetail.isLiked.not())
         }
+        Log.e("!!!!", pokemonDetail.types.size.toString())
     }
 
     private fun updateLikeImg(binding: FragmentPokemonDetailBinding, isLiked: Boolean){
