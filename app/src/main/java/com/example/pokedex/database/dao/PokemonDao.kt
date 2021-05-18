@@ -12,6 +12,12 @@ interface PokemonDao {
     fun getPokemonList(): List<DbPokemonBaseInfo>
 
     @Transaction
+    @Query("SELECT * FROM dbpokemonbaseinfo WHERE pokemonId IN" +
+            " (SELECT p.pokemonId FROM dbgeneration g LEFT JOIN pokemontogeneration p" +
+            " ON g.generationId = p.generationId WHERE g.generationId = :generationId)")
+    fun getPokemonListByGeneration(generationId: Long): List<DbPokemonBaseInfo>
+
+    @Transaction
     @Query("SELECT isLiked FROM dbpokemondetail WHERE pokemonId = :pokemonId")
     fun isPokemonLiked(pokemonId: Long): Boolean?
 
@@ -23,6 +29,10 @@ interface PokemonDao {
     @Transaction
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertDetail( pokemon: DbPokemonDetail)
+
+    @Transaction
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertPokemonToGeneration(pokemonToGenerationList: List<PokemonToGeneration>)
 
     @Transaction
     @Insert(onConflict = OnConflictStrategy.REPLACE)

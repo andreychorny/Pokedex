@@ -5,6 +5,7 @@ import androidx.lifecycle.Transformations
 import com.example.pokedex.data.network.*
 import com.example.pokedex.database.PokedexDatabase
 import com.example.pokedex.database.entity.DbPokemonDetail
+import com.example.pokedex.database.entity.PokemonToGeneration
 import com.example.pokedex.database.entity.PokemonTypeCrossRef
 import com.example.pokedex.database.entity.asDomainEntity
 import com.example.pokedex.domain.*
@@ -33,12 +34,24 @@ class NetworkPokemonRepository(
     }
 
     override suspend fun getGenerationsList(): List<GenerationEntity> {
+        var generations = listOf<GenerationEntity>()
+        withContext(Dispatchers.IO) {
+            generations = database.generationDao.getGenerationList().map { it.asDomainEntity() }
+            if (generations.isEmpty()) {
+                generations = downloadGenerationList()
+                database.generationDao.insert(generations.map { it.asDatabaseEntity() })
+            }
+        }
+        return generations
+
+    }
+
+    private suspend fun downloadGenerationList(): List<GenerationEntity>{
         return api.getAllGenerations().results.map {
             val id = RETRIEVE_ID_REGEX.find(it.url)!!.value.toLong()
             GenerationEntity(id, it.name)
         }
     }
-
 
     override suspend fun getPokemonById(id: Long): LiveData<PokemonDetailEntity> {
 
@@ -95,6 +108,20 @@ class NetworkPokemonRepository(
     }
 
     private suspend fun retrievePokemonByGeneration(generationId: Long): List<PokemonEntity> {
+        var pokemons = listOf<PokemonEntity>()
+        withContext(Dispatchers.IO) {
+            pokemons = database.pokemonDao.getPokemonListByGeneration(generationId).map { it.asDomainEntity() }
+            if (pokemons.isEmpty()) {
+                pokemons = downloadPokemonByGeneration(generationId)
+                database.pokemonDao.insertBaseInfoList(pokemons.map { it.asDatabaseEntity() })
+                database.pokemonDao.insertPokemonToGeneration(pokemons.map{PokemonToGeneration(it.id, generationId)})
+            }
+        }
+        return pokemons
+
+    }
+
+    private suspend fun downloadPokemonByGeneration(generationId: Long): List<PokemonEntity>{
         return api.getPokemonRosterByGeneration(generationId).results
             .filter { RETRIEVE_ID_REGEX.containsMatchIn(it.url) }
             .map {
@@ -102,7 +129,6 @@ class NetworkPokemonRepository(
                 PokemonEntity(id, it.name, generateOfficialArtworkUrlFromId(id))
             }
     }
-
     private suspend fun retrievePokemonByType(typeId: Long): List<PokemonEntity> {
         //TODO
         return api.getAllPokemonRoster().results

@@ -1,8 +1,11 @@
 package com.example.pokedex.database.entity
 
 import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
+@Entity
 data class PokemonToGeneration(
-    @Embedded val pokemonBaseInfo: DbPokemonBaseInfo,
+    @PrimaryKey val pokemonId: Long,
     val generationId: Long
 )
