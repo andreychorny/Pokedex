@@ -5,12 +5,14 @@ import android.view.*
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pokedex.R
 import com.example.pokedex.data.network.PokemonApiFilter
 import com.example.pokedex.databinding.FragmentPokemonRosterBinding
 import com.example.pokedex.presentation.adapter.PokemonRosterAdapter
+import com.example.pokedex.presentation.detail.PokemonDetailViewModel
 import com.example.pokedex.presentation.adapter.RosterItem
 import com.google.android.material.snackbar.Snackbar
 import org.koin.androidx.viewmodel.ext.android.viewModel

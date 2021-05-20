@@ -5,9 +5,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pokedex.data.network.PokemonApiFilter
+import com.example.pokedex.data.network.PokemonRosterApi
+import com.example.pokedex.database.PokedexDatabase
 import com.example.pokedex.domain.PokemonEntity
 import com.example.pokedex.domain.PokemonRepository
 import com.example.pokedex.presentation.adapter.*
+import com.example.pokedex.presentation.detail.PokemonDetailViewModel
 import kotlinx.coroutines.launch
 import java.lang.Exception
 

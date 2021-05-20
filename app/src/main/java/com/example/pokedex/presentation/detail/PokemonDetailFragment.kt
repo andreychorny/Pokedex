@@ -1,38 +1,42 @@
 package com.example.pokedex.presentation.detail
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
+import com.example.pokedex.R
 import com.example.pokedex.databinding.FragmentPokemonDetailBinding
 import com.example.pokedex.domain.PokemonDetailEntity
 import com.google.android.material.snackbar.Snackbar
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlinx.coroutines.InternalCoroutinesApi
 
 class PokemonDetailFragment: Fragment() {
 
     private val pokemonDetailViewModel: PokemonDetailViewModel by viewModel()
 
+    @InternalCoroutinesApi
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
 
         val args = PokemonDetailFragmentArgs.fromBundle(requireArguments())
         val binding = FragmentPokemonDetailBinding.inflate(inflater)
         binding.lifecycleOwner = this
+
         pokemonDetailViewModel.viewState().observe(viewLifecycleOwner, {state ->
             when (state) {
                 is PokemonDetailViewState.Loading -> {
-                    showProgress(binding)
                 }
                 is PokemonDetailViewState.Data -> {
                     showData(binding, state.detail)
                 }
                 is PokemonDetailViewState.Error -> {
-                    showError(binding, args.pokemonId, state.message)
                 }
             }
         })
@@ -51,9 +55,21 @@ class PokemonDetailFragment: Fragment() {
         binding.pokemonDetailName.text = pokemonDetail.name
         binding.pokemonHeight.text = pokemonDetail.height.toString()
         binding.pokemonWeight.text = pokemonDetail.weight.toString()
-        Glide.with(binding.pokemonDetailImg.context)
+        Glide.with(binding.pokemonImage.context)
             .load(pokemonDetail.officialArtworkUrl)
-            .into(binding.pokemonDetailImg)
+            .into(binding.pokemonImage)
+        updateLikeImg(binding, pokemonDetail.isLiked)
+        binding.likeImage.setOnClickListener {
+            pokemonDetailViewModel.updateLiked(pokemonDetail)
+            updateLikeImg(binding, pokemonDetail.isLiked.not())
+        }
+    }
+
+    private fun updateLikeImg(binding: FragmentPokemonDetailBinding, isLiked: Boolean){
+        when(isLiked){
+            false -> binding.likeImage.setImageResource(R.drawable.heart_outline)
+            true -> binding.likeImage.setImageResource(R.drawable.heart)
+        }
     }
 
 

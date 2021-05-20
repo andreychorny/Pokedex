@@ -1,11 +1,21 @@
 package com.example.pokedex.presentation.detail
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import android.app.Application
+import android.util.Log
+import androidx.lifecycle.*
+import com.example.pokedex.data.NetworkPokemonRepository
+import com.example.pokedex.data.network.PokemonRosterApi
+import com.example.pokedex.database.PokedexDatabase
+import com.example.pokedex.domain.PokemonDetailEntity
 import com.example.pokedex.domain.PokemonRepository
+import com.example.pokedex.domain.asDatabaseEntity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.IOException
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 
 class PokemonDetailViewModel(private val repository: PokemonRepository): ViewModel() {
 
@@ -13,13 +23,31 @@ class PokemonDetailViewModel(private val repository: PokemonRepository): ViewMod
     fun viewState(): LiveData<PokemonDetailViewState> = viewStateLiveData
 
 
-    fun loadDetail(id: Long){
-        viewStateLiveData.value = PokemonDetailViewState.Loading
+    @InternalCoroutinesApi
+    fun loadDetail(id: Long) {
         viewModelScope.launch {
-            try {
-                viewStateLiveData.value = PokemonDetailViewState.Data(repository.getPokemonById(id))
-            }catch (e: Exception){
-                viewStateLiveData.value = PokemonDetailViewState.Error("Loading failed, no internet connection")
+            //TODO fix error of app shutdown if no pokemon in cache + no internet connection
+            repository.getPokemonById(id).collect { detail ->
+                viewStateLiveData.value = detail?.let { PokemonDetailViewState.Data(it) }
+
+            }
+        }
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                repository.downloadPokemonDetail(id)
+            }
+        }
+    }
+
+    fun updateLiked(pokemonDetail: PokemonDetailEntity) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                pokemonDetail.let {
+                    val newIsLiked = it.isLiked.not()
+                    repository.updatePokemonInDatabase(
+                        it.asDatabaseEntity(newIsLiked)
+                    )
+                }
             }
         }
     }
