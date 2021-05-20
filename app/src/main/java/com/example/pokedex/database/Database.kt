@@ -1,8 +1,6 @@
 package com.example.pokedex.database
 
-import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.pokedex.database.dao.GenerationDao
 import com.example.pokedex.database.dao.PokemonDao
@@ -18,29 +16,5 @@ abstract class PokedexDatabase: RoomDatabase() {
     abstract val statDao: StatDao
     abstract val typeDao: TypeDao
     abstract val generationDao: GenerationDao
-    companion object {
-        @Volatile
-        private var INSTANCE: PokedexDatabase? = null
-
-        fun getInstance(context: Context): PokedexDatabase {
-            synchronized(this) {
-
-                var instance = INSTANCE
-
-                if (instance == null) {
-                    instance = Room.databaseBuilder(
-                        context.applicationContext,
-                        PokedexDatabase::class.java,
-                        "pokedex_database"
-                    )
-                        .fallbackToDestructiveMigration()
-                        .build()
-                    INSTANCE = instance
-                }
-
-                return instance
-            }
-        }
-    }
 }
 

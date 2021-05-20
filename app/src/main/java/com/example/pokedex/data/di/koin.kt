@@ -1,12 +1,16 @@
 package com.example.pokedex.data.di
 
+import android.app.Application
+import androidx.room.Room
 import com.example.pokedex.data.NetworkPokemonRepository
 import com.example.pokedex.data.network.PokemonRosterService
+import com.example.pokedex.database.PokedexDatabase
 import com.example.pokedex.domain.PokemonRepository
 import com.example.pokedex.presentation.detail.PokemonDetailViewModel
 import com.example.pokedex.presentation.roster.PokemonRosterViewModel
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -18,10 +22,19 @@ private const val BASE_URL =
 
 val appModule = module {
     single<PokemonRosterService> { createPokedexApiService() }
-    single<PokemonRepository> { NetworkPokemonRepository(get()) }
-
+    single<PokemonRepository> { NetworkPokemonRepository(get(),get()) }
+    single{ provideDatabase(androidApplication())}
     viewModel { PokemonRosterViewModel(get()) }
     viewModel { PokemonDetailViewModel(get()) }
+}
+
+private fun provideDatabase(application: Application): PokedexDatabase {
+    return Room.databaseBuilder(
+        application,
+        PokedexDatabase::class.java,
+        "pokedex_database")
+        .fallbackToDestructiveMigration()
+        .build()
 }
 
 private fun createPokedexApiService(): PokemonRosterService {

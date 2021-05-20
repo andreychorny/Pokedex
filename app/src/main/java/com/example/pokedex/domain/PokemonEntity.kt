@@ -7,7 +7,7 @@ data class PokemonEntity(
         val name: String,
         val frontImgUrl: String,
 )
-fun PokemonEntity.asDatabaseEntity(isLiked: Boolean = false): DbPokemonBaseInfo {
+fun PokemonEntity.asDatabaseEntity(): DbPokemonBaseInfo {
         return DbPokemonBaseInfo(
                 pokemonId = id,
                 name = name,

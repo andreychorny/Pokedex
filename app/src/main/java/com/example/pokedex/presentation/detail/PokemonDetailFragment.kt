@@ -78,6 +78,7 @@ class PokemonDetailFragment: Fragment() {
         binding.detailViewGroup.isVisible = false
     }
 
+    @InternalCoroutinesApi
     private fun showError(
         binding: FragmentPokemonDetailBinding,
         id: Long,

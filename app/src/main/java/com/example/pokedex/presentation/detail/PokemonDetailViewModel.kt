@@ -1,11 +1,6 @@
 package com.example.pokedex.presentation.detail
 
-import android.app.Application
-import android.util.Log
 import androidx.lifecycle.*
-import com.example.pokedex.data.NetworkPokemonRepository
-import com.example.pokedex.data.network.PokemonRosterApi
-import com.example.pokedex.database.PokedexDatabase
 import com.example.pokedex.domain.PokemonDetailEntity
 import com.example.pokedex.domain.PokemonRepository
 import com.example.pokedex.domain.asDatabaseEntity
@@ -13,9 +8,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.IOException
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import java.lang.Exception
 
 class PokemonDetailViewModel(private val repository: PokemonRepository): ViewModel() {
 
@@ -32,9 +26,14 @@ class PokemonDetailViewModel(private val repository: PokemonRepository): ViewMod
 
             }
         }
+        //updating value of pokemon detail from net
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                repository.downloadPokemonDetail(id)
+                try {
+                    repository.downloadPokemonDetail(id)
+                }catch (e: Exception){
+                    //TODO process exception when no internet connection
+                }
             }
         }
     }
