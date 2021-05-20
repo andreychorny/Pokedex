@@ -19,9 +19,8 @@ interface PokemonDao {
     fun getPokemonListByGeneration(generationId: Long): List<DbPokemonBaseInfo>
 
     @Transaction
-    @Query("SELECT * FROM dbpokemonbaseinfo WHERE pokemonId IN" +
-            " (SELECT p.pokemonId FROM dbtype t LEFT JOIN pokemontotype p" +
-            " ON t.typeId = p.typeId WHERE t.typeId = :typeId)")
+    @Query("SELECT * FROM dbpokemonbaseinfo WHERE pokemonId IN (SELECT p.pokemonId " +
+            "FROM dbtype t LEFT JOIN pokemontypecrossref p ON t.typeId = p.typeId WHERE t.typeId = :typeId)")
     fun getPokemonListByType(typeId: Long): List<DbPokemonBaseInfo>
 
     @Transaction

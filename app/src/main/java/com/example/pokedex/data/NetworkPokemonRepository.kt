@@ -131,15 +131,41 @@ class NetworkPokemonRepository(
 
 
     private suspend fun retrievePokemonByType(typeId: Long): List<PokemonEntity>{
+        var pokemons = listOf<PokemonEntity>()
+        withContext(Dispatchers.IO) {
+            pokemons = database.pokemonDao.getPokemonListByType(typeId).map { it.asDomainEntity() }
+            if (pokemons.isEmpty()) {
+                pokemons = downloadPokemonByType(typeId)
+                database.pokemonDao.insertBaseInfoList(pokemons.map { it.asDatabaseEntity() })
+                database.pokemonDao.insertPokemonToTypes(pokemons.map{ PokemonTypeCrossRef(it.id, typeId) })
+            }
+        }
+        return pokemons
+
+    }
+
+    private suspend fun downloadPokemonByType(typeId: Long): List<PokemonEntity>{
         return api.getPokemonRosterByType(typeId).results
             .filter { RETRIEVE_ID_REGEX.containsMatchIn(it.pokemon.url) }
             .map {
                 val id = RETRIEVE_ID_REGEX.find(it.pokemon.url)!!.value.toLong()
                 PokemonEntity(id, it.pokemon.name, generateOfficialArtworkUrlFromId(id)) }
+
     }
 
-
     override suspend fun getTypesList(): List<TypeEntity> {
+        var types = listOf<TypeEntity>()
+        withContext(Dispatchers.IO) {
+            types = database.typeDao.getTypeList().map { it.asDomainEntity() }
+            if (types.isEmpty()) {
+                types = downloadTypeList()
+                database.typeDao.insert(types.map { it.asDatabaseEntity() })
+            }
+        }
+        return types
+    }
+
+    private suspend fun downloadTypeList(): List<TypeEntity> {
         return api.getAllTypes().results.map {
             val id = RETRIEVE_ID_REGEX.find(it.url)?.value?.toLong() ?: 0
             TypeEntity(id, it.name)
