@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide
 import com.example.pokedex.R
 import com.example.pokedex.databinding.FragmentPokemonDetailBinding
 import com.example.pokedex.domain.PokemonDetailEntity
+import kotlinx.coroutines.InternalCoroutinesApi
 
 class PokemonDetailFragment: Fragment() {
 
@@ -21,6 +22,7 @@ class PokemonDetailFragment: Fragment() {
             .get(PokemonDetailViewModel::class.java)
     }
 
+    @InternalCoroutinesApi
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
 
@@ -28,11 +30,19 @@ class PokemonDetailFragment: Fragment() {
         val binding = FragmentPokemonDetailBinding.inflate(inflater)
         binding.lifecycleOwner = this
 
-        pokemonDetailViewModel.loadDetail(args.pokemonId).observe(viewLifecycleOwner, { pokemonDetail: PokemonDetailEntity ->
-            bind(binding, pokemonDetail)
-
+        pokemonDetailViewModel.viewState().observe(viewLifecycleOwner, {state ->
+            when (state) {
+                is PokemonDetailViewState.Loading -> {
+                }
+                is PokemonDetailViewState.Data -> {
+                    bind(binding, state.detail)
+                }
+                is PokemonDetailViewState.Error -> {
+                }
+            }
         })
 
+        pokemonDetailViewModel.loadDetail(args.pokemonId)
         return binding.root
     }
 
@@ -48,10 +58,9 @@ class PokemonDetailFragment: Fragment() {
             .into(binding.pokemonImage)
         updateLikeImg(binding, pokemonDetail.isLiked)
         binding.likeImage.setOnClickListener {
-            pokemonDetailViewModel.updateLiked()
+            pokemonDetailViewModel.updateLiked(pokemonDetail)
             updateLikeImg(binding, pokemonDetail.isLiked.not())
         }
-        Log.e("!!!!", pokemonDetail.types.size.toString())
     }
 
     private fun updateLikeImg(binding: FragmentPokemonDetailBinding, isLiked: Boolean){

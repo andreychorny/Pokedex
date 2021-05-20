@@ -3,6 +3,7 @@ package com.example.pokedex.database.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.pokedex.database.entity.*
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PokemonDao {
@@ -23,7 +24,7 @@ interface PokemonDao {
 
     @Transaction
     @Query("SELECT * FROM dbpokemondetail WHERE pokemonId = :pokemonId")
-    fun getPokemonDetail(pokemonId: Long): LiveData<FullDbPokemonDetail>
+    fun getPokemonDetail(pokemonId: Long): Flow<FullDbPokemonDetail?>
 
 
     @Transaction

@@ -11,6 +11,8 @@ import com.example.pokedex.database.entity.asDomainEntity
 import com.example.pokedex.domain.*
 import com.example.pokedex.generateOfficialArtworkUrlFromId
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 private val RETRIEVE_ID_REGEX = "(\\d+)(?!.*\\d)".toRegex()
@@ -53,11 +55,9 @@ class NetworkPokemonRepository(
         }
     }
 
-    override suspend fun getPokemonById(id: Long): LiveData<PokemonDetailEntity> {
+    override suspend fun getPokemonById(id: Long): Flow<PokemonDetailEntity?> {
 
-        return Transformations.map(database.pokemonDao.getPokemonDetail(id)) {
-            it?.asDomainEntity()
-        }
+        return database.pokemonDao.getPokemonDetail(id).map { it?.asDomainEntity() }
     }
 
     override suspend fun downloadPokemonDetail(id: Long) {
