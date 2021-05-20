@@ -1,5 +1,6 @@
 package com.example.pokedex.data.network
 
+import com.example.pokedex.RETRIEVE_ID_REGEX
 import com.example.pokedex.database.entity.DbPokemonDetail
 import com.example.pokedex.database.entity.DbStat
 import com.example.pokedex.database.entity.DbType
@@ -95,7 +96,8 @@ data class PokemonTypesData(
 )
 
 data class TypesData(
-    val name: String
+    val name: String,
+    val url: String
 )
 
 data class TypeOfPokemonsResponse(
@@ -118,7 +120,7 @@ data class TypeInList(
 )
 
 fun PokemonTypesData.asDatabaseType(): DbType{
-    return DbType(type.name)
+    return DbType(RETRIEVE_ID_REGEX.find(type.url)?.value?.toLong() ?: 0, type.name)
 }
 fun List<PokemonTypesData>.asDatabaseType(): List<DbType>{
     return map { it.asDatabaseType() }

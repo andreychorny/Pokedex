@@ -27,11 +27,3 @@ fun PokemonDetailEntity.asDatabaseEntity(isLiked: Boolean = false): DbPokemonDet
         isLiked = isLiked
     )
 }
-
-fun Map<String, Int>.asDatabaseStat(pokemonId: Long): List<DbStat> {
-    return map { DbStat(pokemonId, it.key, it.value) }
-}
-
-fun List<String>.asDatabaseType(): List<DbType> {
-    return map { DbType(name = it) }
-}

@@ -5,3 +5,5 @@ fun generateOfficialArtworkUrlFromId(id: Long): String =
 
 fun generateDreamWorldPicUrlFromId(id: Long): String =
     "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/$id.svg"
+
+val RETRIEVE_ID_REGEX = "(\\d+)(?!.*\\d)".toRegex()

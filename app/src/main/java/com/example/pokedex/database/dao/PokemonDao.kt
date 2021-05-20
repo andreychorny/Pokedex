@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 interface PokemonDao {
 
     @Transaction
-    @Query("SELECT * FROM dbpokemonbaseinfo")
+    @Query("SELECT * FROM dbpokemonbaseinfo LIMIT 50")
     fun getPokemonList(): List<DbPokemonBaseInfo>
 
     @Transaction
@@ -17,6 +17,12 @@ interface PokemonDao {
             " (SELECT p.pokemonId FROM dbgeneration g LEFT JOIN pokemontogeneration p" +
             " ON g.generationId = p.generationId WHERE g.generationId = :generationId)")
     fun getPokemonListByGeneration(generationId: Long): List<DbPokemonBaseInfo>
+
+    @Transaction
+    @Query("SELECT * FROM dbpokemonbaseinfo WHERE pokemonId IN" +
+            " (SELECT p.pokemonId FROM dbtype t LEFT JOIN pokemontotype p" +
+            " ON t.typeId = p.typeId WHERE t.typeId = :typeId)")
+    fun getPokemonListByType(typeId: Long): List<DbPokemonBaseInfo>
 
     @Transaction
     @Query("SELECT isLiked FROM dbpokemondetail WHERE pokemonId = :pokemonId")

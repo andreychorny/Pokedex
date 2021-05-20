@@ -20,10 +20,12 @@ class PokemonDetailViewModel(private val repository: PokemonRepository): ViewMod
     @InternalCoroutinesApi
     fun loadDetail(id: Long) {
         viewModelScope.launch {
+            viewStateLiveData.value = PokemonDetailViewState.Loading
             //TODO fix error of app shutdown if no pokemon in cache + no internet connection
             repository.getPokemonById(id).collect { detail ->
-                viewStateLiveData.value = detail?.let { PokemonDetailViewState.Data(it) }
-
+                detail?.let{
+                    viewStateLiveData.value = PokemonDetailViewState.Data(it)
+                }
             }
         }
         //updating value of pokemon detail from net
@@ -32,7 +34,8 @@ class PokemonDetailViewModel(private val repository: PokemonRepository): ViewMod
                 try {
                     repository.downloadPokemonDetail(id)
                 }catch (e: Exception){
-                    //TODO process exception when no internet connection
+                    //TODO add exception handling
+                    //can't set PokemonViewState error because of dispatcher io
                 }
             }
         }

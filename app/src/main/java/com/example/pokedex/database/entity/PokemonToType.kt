@@ -4,8 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class DbType(
-    @PrimaryKey
-    val typeId: Long,
-    val name: String
+data class PokemonToType (
+    @PrimaryKey val pokemonId: Long,
+    val typeId: Long
 )

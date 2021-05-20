@@ -32,11 +32,13 @@ class PokemonDetailFragment: Fragment() {
         pokemonDetailViewModel.viewState().observe(viewLifecycleOwner, {state ->
             when (state) {
                 is PokemonDetailViewState.Loading -> {
+                    showProgress(binding)
                 }
                 is PokemonDetailViewState.Data -> {
                     showData(binding, state.detail)
                 }
                 is PokemonDetailViewState.Error -> {
+                    showError(binding, args.pokemonId, state.message)
                 }
             }
         })
@@ -65,6 +67,7 @@ class PokemonDetailFragment: Fragment() {
         }
     }
 
+
     private fun updateLikeImg(binding: FragmentPokemonDetailBinding, isLiked: Boolean){
         when(isLiked){
             false -> binding.likeImage.setImageResource(R.drawable.heart_outline)
@@ -91,7 +94,5 @@ class PokemonDetailFragment: Fragment() {
                 pokemonDetailViewModel.loadDetail(id)
             }
             .show()
-
     }
-
 }

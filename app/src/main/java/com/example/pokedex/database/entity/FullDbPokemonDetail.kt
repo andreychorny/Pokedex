@@ -14,7 +14,7 @@ data class FullDbPokemonDetail(
     val stats: List<DbStat>,
     @Relation(
         parentColumn = "pokemonId",
-        entityColumn = "name",
+        entityColumn = "typeId",
         associateBy = Junction(PokemonTypeCrossRef::class)
     )
     val types: List<DbType>

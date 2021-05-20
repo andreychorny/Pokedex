@@ -2,6 +2,7 @@ package com.example.pokedex.data
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import com.example.pokedex.RETRIEVE_ID_REGEX
 import com.example.pokedex.data.network.*
 import com.example.pokedex.database.PokedexDatabase
 import com.example.pokedex.database.entity.DbPokemonDetail
@@ -18,8 +19,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-
-private val RETRIEVE_ID_REGEX = "(\\d+)(?!.*\\d)".toRegex()
 
 class NetworkPokemonRepository(
     private val api: PokemonRosterService,
@@ -75,11 +74,10 @@ class NetworkPokemonRepository(
         database.typeDao.insert(types)
         val pokemonToTypeList = mutableListOf<PokemonTypeCrossRef>()
         for(type in types) {
-            pokemonToTypeList.add(PokemonTypeCrossRef(id, type.name))
+            pokemonToTypeList.add(PokemonTypeCrossRef(id, type.typeId))
         }
         database.pokemonDao.insertPokemonToTypes(pokemonToTypeList)
         database.pokemonDao.insertDetail(newPokemonDetail)
-
     }
 
     override suspend fun updatePokemonInDatabase(dbPokemonDetail: DbPokemonDetail) {
@@ -98,6 +96,7 @@ class NetworkPokemonRepository(
         }
         return pokemons
     }
+
 
     private suspend fun downloadAllPokemon(): List<PokemonEntity> {
         return api.getAllPokemonRoster().results
@@ -119,7 +118,6 @@ class NetworkPokemonRepository(
             }
         }
         return pokemons
-
     }
 
     private suspend fun downloadPokemonByGeneration(generationId: Long): List<PokemonEntity>{
@@ -131,6 +129,7 @@ class NetworkPokemonRepository(
             }
     }
 
+
     private suspend fun retrievePokemonByType(typeId: Long): List<PokemonEntity>{
         return api.getPokemonRosterByType(typeId).results
             .filter { RETRIEVE_ID_REGEX.containsMatchIn(it.pokemon.url) }
@@ -138,6 +137,7 @@ class NetworkPokemonRepository(
                 val id = RETRIEVE_ID_REGEX.find(it.pokemon.url)!!.value.toLong()
                 PokemonEntity(id, it.pokemon.name, generateOfficialArtworkUrlFromId(id)) }
     }
+
 
     override suspend fun getTypesList(): List<TypeEntity> {
         return api.getAllTypes().results.map {

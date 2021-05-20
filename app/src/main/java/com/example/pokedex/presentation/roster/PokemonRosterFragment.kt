@@ -119,7 +119,6 @@ class PokemonRosterFragment : Fragment() {
     private fun showProgress( binding: FragmentPokemonRosterBinding) {
         binding.rosterProgressBar.isVisible = true
         binding.rosterViewGroup.isVisible = false
-        Toast.makeText(context, "Loading", Toast.LENGTH_LONG).show()
     }
 
     private fun showData( binding: FragmentPokemonRosterBinding, items: List<RosterItem>) {
