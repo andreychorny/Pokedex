@@ -1,6 +1,5 @@
 package com.example.pokedex.database.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.pokedex.database.entity.*
 import kotlinx.coroutines.flow.Flow

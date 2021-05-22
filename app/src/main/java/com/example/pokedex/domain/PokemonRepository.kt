@@ -1,6 +1,5 @@
 package com.example.pokedex.domain
 
-import androidx.lifecycle.LiveData
 import com.example.pokedex.data.network.PokemonApiFilter
 import com.example.pokedex.database.entity.DbPokemonDetail
 import kotlinx.coroutines.flow.Flow

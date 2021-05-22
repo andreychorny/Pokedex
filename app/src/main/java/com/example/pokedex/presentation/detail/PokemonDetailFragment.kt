@@ -1,14 +1,11 @@
 package com.example.pokedex.presentation.detail
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.pokedex.R
 import com.example.pokedex.databinding.FragmentPokemonDetailBinding
@@ -17,28 +14,32 @@ import com.google.android.material.snackbar.Snackbar
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlinx.coroutines.InternalCoroutinesApi
 
-class PokemonDetailFragment: Fragment() {
+class PokemonDetailFragment : Fragment() {
 
     private val pokemonDetailViewModel: PokemonDetailViewModel by viewModel()
+    private var _binding: FragmentPokemonDetailBinding? = null
+    private val binding get() = _binding!!
 
     @InternalCoroutinesApi
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
 
         val args = PokemonDetailFragmentArgs.fromBundle(requireArguments())
-        val binding = FragmentPokemonDetailBinding.inflate(inflater)
+        _binding = FragmentPokemonDetailBinding.inflate(inflater)
         binding.lifecycleOwner = this
 
-        pokemonDetailViewModel.viewState().observe(viewLifecycleOwner, {state ->
+        pokemonDetailViewModel.viewState().observe(viewLifecycleOwner, { state ->
             when (state) {
                 is PokemonDetailViewState.Loading -> {
-                    showProgress(binding)
+                    showProgress()
                 }
                 is PokemonDetailViewState.Data -> {
-                    showData(binding, state.detail)
+                    showData(state.detail)
                 }
                 is PokemonDetailViewState.Error -> {
-                    showError(binding, args.pokemonId, state.message)
+                    showError(args.pokemonId, state.message)
                 }
             }
         })
@@ -48,7 +49,6 @@ class PokemonDetailFragment: Fragment() {
     }
 
     private fun showData(
-        binding: FragmentPokemonDetailBinding,
         pokemonDetail: PokemonDetailEntity
     ) {
         binding.detailProgressBar.isVisible = false
@@ -60,32 +60,32 @@ class PokemonDetailFragment: Fragment() {
         Glide.with(binding.pokemonImage.context)
             .load(pokemonDetail.officialArtworkUrl)
             .into(binding.pokemonImage)
-        updateLikeImg(binding, pokemonDetail.isLiked)
+        updateLikeImg(pokemonDetail.isLiked)
         binding.likeImage.setOnClickListener {
             pokemonDetailViewModel.updateLiked(pokemonDetail)
-            updateLikeImg(binding, pokemonDetail.isLiked.not())
+            updateLikeImg(pokemonDetail.isLiked.not())
         }
     }
 
 
-    private fun updateLikeImg(binding: FragmentPokemonDetailBinding, isLiked: Boolean){
-        when(isLiked){
+    private fun updateLikeImg(isLiked: Boolean) {
+        when (isLiked) {
             false -> binding.likeImage.setImageResource(R.drawable.heart_outline)
             true -> binding.likeImage.setImageResource(R.drawable.heart)
         }
     }
 
 
-    private fun showProgress(binding: FragmentPokemonDetailBinding) {
+    private fun showProgress() {
         binding.detailProgressBar.isVisible = true
         binding.detailViewGroup.isVisible = false
     }
 
     @InternalCoroutinesApi
     private fun showError(
-        binding: FragmentPokemonDetailBinding,
         id: Long,
-        errorMessage: String) {
+        errorMessage: String
+    ) {
         binding.detailProgressBar.isVisible = false
         binding.detailViewGroup.isVisible = false
 

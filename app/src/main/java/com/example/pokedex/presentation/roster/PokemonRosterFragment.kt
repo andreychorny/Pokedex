@@ -2,17 +2,14 @@ package com.example.pokedex.presentation.roster
 
 import android.os.Bundle
 import android.view.*
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pokedex.R
 import com.example.pokedex.data.network.PokemonApiFilter
 import com.example.pokedex.databinding.FragmentPokemonRosterBinding
 import com.example.pokedex.presentation.adapter.PokemonRosterAdapter
-import com.example.pokedex.presentation.detail.PokemonDetailViewModel
 import com.example.pokedex.presentation.adapter.RosterItem
 import com.google.android.material.snackbar.Snackbar
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -21,13 +18,14 @@ class PokemonRosterFragment : Fragment() {
 
     private val pokemonRosterViewModel: PokemonRosterViewModel by viewModel()
     private var adapter: PokemonRosterAdapter? = null
-
+    private var _binding: FragmentPokemonRosterBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = FragmentPokemonRosterBinding.inflate(inflater)
+        _binding = FragmentPokemonRosterBinding.inflate(inflater)
         binding.lifecycleOwner = this
 
         initRecyclerView()
@@ -37,25 +35,29 @@ class PokemonRosterFragment : Fragment() {
         pokemonRosterViewModel.viewState().observe(viewLifecycleOwner) { state ->
             when (state) {
                 is PokemonRosterViewState.Loading -> {
-                    showProgress(binding)
+                    showProgress()
                 }
                 is PokemonRosterViewState.Data -> {
-                    showData(binding, state.items)
+                    showData(state.items)
                 }
                 is PokemonRosterViewState.Error -> {
-                    showError(binding, state)
+                    showError(state)
                 }
             }
         }
 
-        setScrollingToTop(binding)
+        setScrollingToTop()
         setHasOptionsMenu(true)
         return binding.root
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 
     //scrolling screen to top after updates
-    private fun setScrollingToTop(binding: FragmentPokemonRosterBinding) {
+    private fun setScrollingToTop() {
         adapter?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onChanged() {
                 binding.pokemonRoster.smoothScrollToPosition(0)
@@ -99,7 +101,7 @@ class PokemonRosterFragment : Fragment() {
         return true
     }
 
-    private fun initRecyclerView(){
+    private fun initRecyclerView() {
         adapter = PokemonRosterAdapter(
             onPokemonItemClicked = { id: Long ->
                 this.findNavController().navigate(
@@ -116,19 +118,18 @@ class PokemonRosterFragment : Fragment() {
         )
     }
 
-    private fun showProgress( binding: FragmentPokemonRosterBinding) {
+    private fun showProgress() {
         binding.rosterProgressBar.isVisible = true
         binding.rosterViewGroup.isVisible = false
     }
 
-    private fun showData( binding: FragmentPokemonRosterBinding, items: List<RosterItem>) {
+    private fun showData(items: List<RosterItem>) {
         binding.rosterProgressBar.isVisible = false
         binding.rosterViewGroup.isVisible = true
         adapter?.submitList(items)
     }
 
     private fun showError(
-        binding: FragmentPokemonRosterBinding,
         state: PokemonRosterViewState.Error
     ) {
         binding.rosterProgressBar.isVisible = false

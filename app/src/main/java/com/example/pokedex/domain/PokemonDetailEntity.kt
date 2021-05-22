@@ -1,8 +1,6 @@
 package com.example.pokedex.domain
 
 import com.example.pokedex.database.entity.DbPokemonDetail
-import com.example.pokedex.database.entity.DbStat
-import com.example.pokedex.database.entity.DbType
 
 data class PokemonDetailEntity(
     val id: Long,

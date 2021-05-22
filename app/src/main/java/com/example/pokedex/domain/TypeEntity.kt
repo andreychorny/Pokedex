@@ -1,6 +1,5 @@
 package com.example.pokedex.domain
 
-import com.example.pokedex.database.entity.DbGeneration
 import com.example.pokedex.database.entity.DbType
 
 data class TypeEntity (
