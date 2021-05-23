@@ -63,8 +63,8 @@ class PokemonRosterViewModel(private val repository: PokemonRepository) : ViewMo
             )
         }
         val pokemons = repository.getPokemonList(filter, currentGenerationId, currentTypeId)
-        resultList.addAll(pokemons.map { it.toItem() })
-        if(resultList.isNotEmpty()){
+        if(pokemons.isNotEmpty()){
+            resultList.addAll(pokemons.map { it.toItem() })
             viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
         }else{
             viewStateLiveData.value = PokemonRosterViewState.Error("Loading failed, no internet connection")

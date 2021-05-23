@@ -25,15 +25,23 @@ class NetworkPokemonRepository(
         filter: PokemonApiFilter,
         generationId: Long, typeId: Long
     ): List<PokemonEntity> {
-        return when (filter) {
-            PokemonApiFilter.SHOW_ALL -> retrieveAllPokemon()
-            PokemonApiFilter.SHOW_GENERATION -> retrievePokemonByGeneration(generationId)
-            PokemonApiFilter.SHOW_TYPE -> retrievePokemonByType(typeId)
+        var pokemons = listOf<PokemonEntity>()
+        withContext(Dispatchers.IO) {
+            pokemons = when (filter) {
+                PokemonApiFilter.SHOW_ALL -> retrieveAllPokemon()
+                PokemonApiFilter.SHOW_GENERATION -> retrievePokemonByGeneration(generationId)
+                PokemonApiFilter.SHOW_TYPE -> retrievePokemonByType(typeId)
+            }
         }
+        return pokemons
     }
 
     override suspend fun getGenerationsList(): List<GenerationEntity> {
-        return database.generationDao.getGenerationList().map { it.asDomainEntity() }
+        var generations = listOf<GenerationEntity>()
+        withContext(Dispatchers.IO){
+            generations = database.generationDao.getGenerationList().map { it.asDomainEntity() }
+        }
+        return generations
     }
 
     override suspend fun downloadGenerationList(): List<GenerationEntity> {
@@ -41,7 +49,9 @@ class NetworkPokemonRepository(
             val id = RETRIEVE_ID_REGEX.find(it.url)!!.value.toLong()
             GenerationEntity(id, it.name)
         }
-        database.generationDao.insert(generations.map { it.asDatabaseEntity() })
+        withContext(Dispatchers.IO){
+            database.generationDao.insert(generations.map { it.asDatabaseEntity() })
+        }
         return generations
     }
 
@@ -59,7 +69,7 @@ class NetworkPokemonRepository(
         val newPokemonDetail = jsonPokemon.asDatabaseEntity(
             oldIsLiked ?: false
         )
-        withContext(Dispatchers.IO){
+        withContext(Dispatchers.IO) {
             database.statDao.insert(stats)
             database.typeDao.insert(types)
             val pokemonToTypeList = mutableListOf<PokemonTypeCrossRef>()
@@ -89,7 +99,7 @@ class NetworkPokemonRepository(
                 val id = RETRIEVE_ID_REGEX.find(it.url)!!.value.toLong()
                 PokemonEntity(id, it.name, generateOfficialArtworkUrlFromId(id))
             }
-        withContext(Dispatchers.IO){
+        withContext(Dispatchers.IO) {
             database.pokemonDao.insertBaseInfoList(pokemons.map { it.asDatabaseEntity() })
         }
         return pokemons
@@ -107,7 +117,7 @@ class NetworkPokemonRepository(
                 val id = RETRIEVE_ID_REGEX.find(it.url)!!.value.toLong()
                 PokemonEntity(id, it.name, generateOfficialArtworkUrlFromId(id))
             }
-        withContext(Dispatchers.IO){
+        withContext(Dispatchers.IO) {
             database.pokemonDao.insertBaseInfoList(pokemons.map { it.asDatabaseEntity() })
             database.pokemonDao.insertPokemonToGeneration(pokemons.map {
                 PokemonToGeneration(
@@ -131,7 +141,7 @@ class NetworkPokemonRepository(
                 val id = RETRIEVE_ID_REGEX.find(it.pokemon.url)!!.value.toLong()
                 PokemonEntity(id, it.pokemon.name, generateOfficialArtworkUrlFromId(id))
             }
-        withContext(Dispatchers.IO){
+        withContext(Dispatchers.IO) {
             database.pokemonDao.insertBaseInfoList(pokemons.map { it.asDatabaseEntity() })
             database.pokemonDao.insertPokemonToTypes(pokemons.map {
                 PokemonTypeCrossRef(
@@ -144,7 +154,11 @@ class NetworkPokemonRepository(
     }
 
     override suspend fun getTypesList(): List<TypeEntity> {
-        return database.typeDao.getTypeList().map { it.asDomainEntity() }
+        var types = listOf<TypeEntity>()
+        withContext(Dispatchers.IO){
+            types = database.typeDao.getTypeList().map { it.asDomainEntity() }
+        }
+        return types
     }
 
     override suspend fun downloadTypeList(): List<TypeEntity> {
@@ -152,7 +166,7 @@ class NetworkPokemonRepository(
             val id = RETRIEVE_ID_REGEX.find(it.url)?.value?.toLong() ?: 0
             TypeEntity(id, it.name)
         }
-        withContext(Dispatchers.IO){
+        withContext(Dispatchers.IO) {
             database.typeDao.insert(types.map { it.asDatabaseEntity() })
         }
         return types
