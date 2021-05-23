@@ -2,7 +2,7 @@ package com.example.pokedex.database.dao
 
 import androidx.room.*
 import com.example.pokedex.database.entity.DbGeneration
-import com.example.pokedex.database.entity.DbPokemonBaseInfo
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface GenerationDao {

@@ -16,26 +16,30 @@ class PokemonDetailViewModel(private val repository: PokemonRepository): ViewMod
     private val viewStateLiveData = MutableLiveData<PokemonDetailViewState>()
     fun viewState(): LiveData<PokemonDetailViewState> = viewStateLiveData
 
-
     @InternalCoroutinesApi
     fun loadDetail(id: Long) {
+        loadDetailFromDatabase(id)
+        updatePokemonDetailFromNet(id)
+    }
+
+    private fun loadDetailFromDatabase(id: Long) {
         viewModelScope.launch {
             viewStateLiveData.value = PokemonDetailViewState.Loading
-            //TODO fix error of app shutdown if no pokemon in cache + no internet connection
             repository.getPokemonById(id).collect { detail ->
-                detail?.let{
+                detail?.let {
                     viewStateLiveData.value = PokemonDetailViewState.Data(it)
                 }
             }
         }
-        //updating value of pokemon detail from net
+    }
+
+    private fun updatePokemonDetailFromNet(id: Long) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
                     repository.downloadPokemonDetail(id)
-                }catch (e: Exception){
-                    //TODO add exception handling
-                    //can't set PokemonViewState error because of dispatcher io
+                } catch (e: Exception) {
+                    viewStateLiveData.postValue(PokemonDetailViewState.Error("Network error"))
                 }
             }
         }

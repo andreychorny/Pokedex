@@ -87,7 +87,6 @@ class PokemonDetailFragment : Fragment() {
         errorMessage: String
     ) {
         binding.detailProgressBar.isVisible = false
-        binding.detailViewGroup.isVisible = false
 
         Snackbar.make(binding.detailCoordinator, errorMessage, Snackbar.LENGTH_INDEFINITE)
             .setAction("Retry") {

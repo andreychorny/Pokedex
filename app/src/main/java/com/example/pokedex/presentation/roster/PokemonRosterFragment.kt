@@ -133,7 +133,6 @@ class PokemonRosterFragment : Fragment() {
         state: PokemonRosterViewState.Error
     ) {
         binding.rosterProgressBar.isVisible = false
-        binding.rosterViewGroup.isVisible = false
         Snackbar.make(binding.rosterCoordinator, state.message, Snackbar.LENGTH_INDEFINITE)
             .setAction("Retry") {
                 pokemonRosterViewModel.loadData()
