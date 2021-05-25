@@ -1,19 +1,28 @@
 package com.example.pokedex.presentation.adapter
 
+import android.R.attr
+import android.graphics.Bitmap
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.example.pokedex.R
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
-import java.lang.IllegalStateException
+
 
 private const val ITEM_TYPE_POKEMON = 1
 private const val ITEM_TYPE_GENERATION_LIST = 2
@@ -29,7 +38,10 @@ class PokemonRosterAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             ITEM_TYPE_POKEMON -> PokemonViewHolder.from(parent, onPokemonItemClicked)
-            ITEM_TYPE_GENERATION_LIST -> GenerationListViewHolder.from(parent, onGenerationItemClicked)
+            ITEM_TYPE_GENERATION_LIST -> GenerationListViewHolder.from(
+                parent,
+                onGenerationItemClicked
+            )
             ITEM_TYPE_TYPE_LIST -> TypeListViewHolder.from(parent, onTypeItemClicked)
             else -> throw IllegalStateException()
         }
@@ -44,7 +56,7 @@ class PokemonRosterAdapter(
             is GenerationListItem -> {
                 (holder as GenerationListViewHolder).bind(item)
             }
-            is TypeListItem ->{
+            is TypeListItem -> {
                 (holder as TypeListViewHolder).bind(item)
             }
         }
@@ -81,22 +93,53 @@ class PokemonRosterAdapter(
 
         private val nameView = itemView.findViewById<TextView>(R.id.pokemonName)
         private val imageView = itemView.findViewById<ImageView>(R.id.pokemonImage)
+        private val cardView = itemView.findViewById<MaterialCardView>(R.id.pokemonCard)
 
         fun bind(item: PokemonItem) {
             nameView.text = item.name
             Glide.with(imageView.context)
+                .asBitmap()
                 .load(item.artImgUrl)
 //                    in case of error, we try download another sprite image, as some pokemons don't have
 //                    official art pic
                 .error(
                     Glide
                         .with(imageView.context)
+                        .asBitmap()
                         .load(item.spriteImgUrl)
-                )
+                        .listener(setBackgroundColor())
+                ).listener(setBackgroundColor())
                 .into(imageView)
             itemView.setOnClickListener {
                 onItemClicked(item.id)
             }
+        }
+
+        private fun setBackgroundColor() = object : RequestListener<Bitmap> {
+            override fun onLoadFailed(
+                e: GlideException?,
+                model: Any?,
+                target: Target<Bitmap>?,
+                isFirstResource: Boolean
+            ): Boolean {
+                return false
+            }
+
+            override fun onResourceReady(
+                resource: Bitmap?,
+                model: Any?,
+                target: Target<Bitmap>?,
+                dataSource: DataSource?,
+                isFirstResource: Boolean
+            ): Boolean {
+                resource?.let {
+                    val palette = Palette.from(it).generate()
+                    cardView.setBackgroundColor(palette.getLightMutedColor(Color.CYAN))
+                    nameView.setTextColor(palette.getDarkVibrantColor(Color.BLACK))
+                }
+                return false
+            }
+
         }
 
         companion object {
@@ -144,8 +187,10 @@ class PokemonRosterAdapter(
         }
 
         companion object {
-            fun from(parent: ViewGroup,
-                     onItemClicked: (id: Long, isChecked: Boolean) -> Unit): GenerationListViewHolder {
+            fun from(
+                parent: ViewGroup,
+                onItemClicked: (id: Long, isChecked: Boolean) -> Unit
+            ): GenerationListViewHolder {
                 val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.generation_list, parent, false)
                 return GenerationListViewHolder(view, onItemClicked)
@@ -188,8 +233,10 @@ class PokemonRosterAdapter(
         }
 
         companion object {
-            fun from(parent: ViewGroup,
-                     onItemClicked: (id: Long, isChecked: Boolean) -> Unit): TypeListViewHolder {
+            fun from(
+                parent: ViewGroup,
+                onItemClicked: (id: Long, isChecked: Boolean) -> Unit
+            ): TypeListViewHolder {
                 val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.type_list, parent, false)
                 return TypeListViewHolder(view, onItemClicked)
