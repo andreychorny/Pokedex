@@ -5,7 +5,8 @@ sealed class RosterItem
 class PokemonItem(
         val id: Long,
         val name: String,
-        val frontImgUrl: String,
+        val artImgUrl: String,
+        val spriteImgUrl: String
 ) : RosterItem()
 
 class GenerationListItem(

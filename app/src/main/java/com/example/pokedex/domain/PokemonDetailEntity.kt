@@ -10,7 +10,7 @@ data class PokemonDetailEntity(
     val stats: Map<String, Int>,
     val types: List<String>,
     val officialArtworkUrl: String,
-    val dreamWorldUrlPic: String,
+    val spriteUrlPic: String,
     val isLiked: Boolean
 )
 
@@ -21,7 +21,7 @@ fun PokemonDetailEntity.asDatabaseEntity(isLiked: Boolean = false): DbPokemonDet
         weight = weight,
         height = height,
         officialArtworkUrl = officialArtworkUrl,
-        dreamWorldUrlPic = dreamWorldUrlPic,
+        spriteUrlPic = spriteUrlPic,
         isLiked = isLiked
     )
 }

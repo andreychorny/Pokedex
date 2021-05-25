@@ -9,13 +9,15 @@ data class DbPokemonBaseInfo (
     @PrimaryKey
     val pokemonId: Long,
     val name: String,
-    val frontImgUrl: String
+    val artImgUrl: String,
+    val spriteImgUrl: String
     )
 
 fun DbPokemonBaseInfo.asDomainEntity(): PokemonEntity {
     return PokemonEntity(
         id = pokemonId,
         name = name,
-        frontImgUrl = frontImgUrl
+        artImgUrl = artImgUrl,
+        spriteImgUrl = spriteImgUrl
     )
 }

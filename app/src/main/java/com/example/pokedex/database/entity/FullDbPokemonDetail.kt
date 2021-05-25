@@ -29,7 +29,7 @@ fun FullDbPokemonDetail.asDomainEntity(): PokemonDetailEntity {
         stats = stats.map { it.name to it.value }.toMap(),
         types = types.map { it.name },
         officialArtworkUrl = pokemonDetail.officialArtworkUrl,
-        dreamWorldUrlPic = pokemonDetail.dreamWorldUrlPic,
+        spriteUrlPic = pokemonDetail.spriteUrlPic,
         isLiked = pokemonDetail.isLiked
     )
 }

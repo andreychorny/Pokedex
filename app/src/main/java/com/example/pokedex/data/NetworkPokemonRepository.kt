@@ -11,6 +11,7 @@ import com.example.pokedex.domain.*
 import com.example.pokedex.data.network.PokemonApiFilter
 import com.example.pokedex.data.network.PokemonRosterService
 import com.example.pokedex.generateOfficialArtworkUrlFromId
+import com.example.pokedex.generateSpritePicUrlFromId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -25,7 +26,7 @@ class NetworkPokemonRepository(
         filter: PokemonApiFilter,
         generationId: Long, typeId: Long
     ): List<PokemonEntity> {
-        var pokemons = listOf<PokemonEntity>()
+        var pokemons: List<PokemonEntity>
         withContext(Dispatchers.IO) {
             pokemons = when (filter) {
                 PokemonApiFilter.SHOW_ALL -> retrieveAllPokemon()
@@ -97,7 +98,7 @@ class NetworkPokemonRepository(
             .filter { RETRIEVE_ID_REGEX.containsMatchIn(it.url) }
             .map {
                 val id = RETRIEVE_ID_REGEX.find(it.url)!!.value.toLong()
-                PokemonEntity(id, it.name, generateOfficialArtworkUrlFromId(id))
+                PokemonEntity(id, it.name, generateOfficialArtworkUrlFromId(id), generateSpritePicUrlFromId(id))
             }
         withContext(Dispatchers.IO) {
             database.pokemonDao.insertBaseInfoList(pokemons.map { it.asDatabaseEntity() })
@@ -115,7 +116,7 @@ class NetworkPokemonRepository(
             .filter { RETRIEVE_ID_REGEX.containsMatchIn(it.url) }
             .map {
                 val id = RETRIEVE_ID_REGEX.find(it.url)!!.value.toLong()
-                PokemonEntity(id, it.name, generateOfficialArtworkUrlFromId(id))
+                PokemonEntity(id, it.name, generateOfficialArtworkUrlFromId(id), generateSpritePicUrlFromId(id))
             }
         withContext(Dispatchers.IO) {
             database.pokemonDao.insertBaseInfoList(pokemons.map { it.asDatabaseEntity() })
@@ -139,7 +140,7 @@ class NetworkPokemonRepository(
             .filter { RETRIEVE_ID_REGEX.containsMatchIn(it.pokemon.url) }
             .map {
                 val id = RETRIEVE_ID_REGEX.find(it.pokemon.url)!!.value.toLong()
-                PokemonEntity(id, it.pokemon.name, generateOfficialArtworkUrlFromId(id))
+                PokemonEntity(id, it.pokemon.name, generateOfficialArtworkUrlFromId(id), generateSpritePicUrlFromId(id))
             }
         withContext(Dispatchers.IO) {
             database.pokemonDao.insertBaseInfoList(pokemons.map { it.asDatabaseEntity() })

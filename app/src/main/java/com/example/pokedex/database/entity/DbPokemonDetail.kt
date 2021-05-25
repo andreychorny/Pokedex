@@ -11,7 +11,7 @@ data class DbPokemonDetail(
     val weight: Int,
     val height: Int,
     val officialArtworkUrl: String,
-    val dreamWorldUrlPic: String,
+    val spriteUrlPic: String,
     val isLiked: Boolean
 )
 

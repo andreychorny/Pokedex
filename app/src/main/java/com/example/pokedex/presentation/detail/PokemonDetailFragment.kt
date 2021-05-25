@@ -59,7 +59,13 @@ class PokemonDetailFragment : Fragment() {
         binding.pokemonWeight.text = pokemonDetail.weight.toString()
         Glide.with(binding.pokemonImage.context)
             .load(pokemonDetail.officialArtworkUrl)
+            .error(
+                Glide
+                    .with(binding.pokemonImage.context)
+                    .load(pokemonDetail.spriteUrlPic)
+            )
             .into(binding.pokemonImage)
+
         updateLikeImg(pokemonDetail.isLiked)
         binding.likeImage.setOnClickListener {
             pokemonDetailViewModel.updateLiked(pokemonDetail)

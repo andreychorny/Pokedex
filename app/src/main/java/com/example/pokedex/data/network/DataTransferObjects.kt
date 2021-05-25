@@ -5,7 +5,7 @@ import com.example.pokedex.database.entity.DbPokemonDetail
 import com.example.pokedex.database.entity.DbStat
 import com.example.pokedex.database.entity.DbType
 import com.example.pokedex.domain.PokemonDetailEntity
-import com.example.pokedex.generateDreamWorldPicUrlFromId
+import com.example.pokedex.generateSpritePicUrlFromId
 import com.example.pokedex.generateOfficialArtworkUrlFromId
 import com.squareup.moshi.Json
 
@@ -39,7 +39,7 @@ fun PokemonDetailsResponse.asDomainEntity(): PokemonDetailEntity {
         stats = stats.map { it.stat.name to it.base_stat }.toMap(),
         types = types.map { it.type.name },
         officialArtworkUrl = generateOfficialArtworkUrlFromId(id.toLong()),
-        dreamWorldUrlPic = generateDreamWorldPicUrlFromId(id.toLong()),
+        spriteUrlPic = generateSpritePicUrlFromId(id.toLong()),
         isLiked = false
     )
 }
@@ -53,7 +53,7 @@ fun PokemonDetailsResponse.asDatabaseEntity(
         weight = weight,
         height = height,
         officialArtworkUrl = generateOfficialArtworkUrlFromId(id.toLong()),
-        dreamWorldUrlPic = generateDreamWorldPicUrlFromId(id.toLong()),
+        spriteUrlPic = generateSpritePicUrlFromId(id.toLong()),
         isLiked = isLiked
     )
 }

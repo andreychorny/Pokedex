@@ -85,7 +85,14 @@ class PokemonRosterAdapter(
         fun bind(item: PokemonItem) {
             nameView.text = item.name
             Glide.with(imageView.context)
-                .load(item.frontImgUrl)
+                .load(item.artImgUrl)
+//                    in case of error, we try download another sprite image, as some pokemons don't have
+//                    official art pic
+                .error(
+                    Glide
+                        .with(imageView.context)
+                        .load(item.spriteImgUrl)
+                )
                 .into(imageView)
             itemView.setOnClickListener {
                 onItemClicked(item.id)

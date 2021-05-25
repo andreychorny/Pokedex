@@ -121,5 +121,5 @@ class PokemonRosterViewModel(private val repository: PokemonRepository) : ViewMo
         loadData()
     }
 
-    private fun PokemonEntity.toItem(): PokemonItem = PokemonItem(id, name, frontImgUrl)
+    private fun PokemonEntity.toItem(): PokemonItem = PokemonItem(id, name, artImgUrl, spriteImgUrl)
 }

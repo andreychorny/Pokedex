@@ -10,7 +10,7 @@ import com.example.pokedex.database.entity.*
 
 @Database(entities = [DbPokemonDetail::class, DbStat::class, DbType::class, PokemonTypeCrossRef::class,
     DbPokemonBaseInfo::class, DbGeneration::class, PokemonToGeneration::class],
-    version = 8)
+    version = 9)
 abstract class PokedexDatabase: RoomDatabase() {
     abstract val pokemonDao: PokemonDao
     abstract val statDao: StatDao
