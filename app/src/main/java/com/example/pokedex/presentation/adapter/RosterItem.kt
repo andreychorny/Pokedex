@@ -18,3 +18,5 @@ class TypeListItem(
         //map of ids to names
         val typeMap: Map<Long,String>
 ) : RosterItem()
+
+object EmptyStateItem: RosterItem()

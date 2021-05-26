@@ -27,6 +27,7 @@ import com.google.android.material.chip.ChipGroup
 private const val ITEM_TYPE_POKEMON = 1
 private const val ITEM_TYPE_GENERATION_LIST = 2
 private const val ITEM_TYPE_TYPE_LIST = 3
+private const val ITEM_TYPE_EMPTY_STATE = 4
 
 class PokemonRosterAdapter(
     private val onPokemonItemClicked: (id: Long) -> Unit,
@@ -43,6 +44,7 @@ class PokemonRosterAdapter(
                 onGenerationItemClicked
             )
             ITEM_TYPE_TYPE_LIST -> TypeListViewHolder.from(parent, onTypeItemClicked)
+            ITEM_TYPE_EMPTY_STATE -> EmptyStateViewHolder.from(parent)
             else -> throw IllegalStateException()
         }
     }
@@ -59,6 +61,9 @@ class PokemonRosterAdapter(
             is TypeListItem -> {
                 (holder as TypeListViewHolder).bind(item)
             }
+            is EmptyStateItem -> {
+                (holder as EmptyStateViewHolder).bind(item)
+            }
         }
     }
 
@@ -67,6 +72,7 @@ class PokemonRosterAdapter(
             is PokemonItem -> ITEM_TYPE_POKEMON
             is GenerationListItem -> ITEM_TYPE_GENERATION_LIST
             is TypeListItem -> ITEM_TYPE_TYPE_LIST
+            is EmptyStateItem -> ITEM_TYPE_EMPTY_STATE
         }
     }
 
@@ -82,6 +88,7 @@ class PokemonRosterAdapter(
                     is PokemonItem -> 1
                     is GenerationListItem -> 2
                     is TypeListItem -> 2
+                    is EmptyStateItem -> 2
                 }
             }
         }
@@ -168,12 +175,12 @@ class PokemonRosterAdapter(
                 val chip = inflator.inflate(R.layout.generation_item, chipGroup, false) as Chip
                 chip.text = "Generation ${generationId.toString()}"
                 chip.tag = generationId
-                if(isFirstChip){
+                if (isFirstChip) {
                     chip.isChecked = true
                     isFirstChip = false
                 }
                 chip.setOnCheckedChangeListener { button, isChecked ->
-                    if(isChecked){
+                    if (isChecked) {
                         onItemClicked(button.tag as Long, isChecked)
                     }
                 }
@@ -214,12 +221,12 @@ class PokemonRosterAdapter(
                 val chip = inflator.inflate(R.layout.type_item, chipGroup, false) as Chip
                 chip.text = typeName
                 chip.tag = typeId
-                if(isFirstChip){
+                if (isFirstChip) {
                     chip.isChecked = true
                     isFirstChip = false
                 }
                 chip.setOnCheckedChangeListener { button, isChecked ->
-                    if(isChecked){
+                    if (isChecked) {
                         onItemClicked(button.tag as Long, isChecked)
                     }
                 }
@@ -245,29 +252,49 @@ class PokemonRosterAdapter(
     }
 }
 
-class PokemonRosterDiffUtil: DiffUtil.ItemCallback<RosterItem>() {
+class EmptyStateViewHolder(
+    view: View,
+) : RecyclerView.ViewHolder(view) {
+
+
+    fun bind(item: EmptyStateItem) {
+    }
+
+    companion object {
+        fun from(
+            parent: ViewGroup,
+        ): EmptyStateViewHolder {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.empty_state_item, parent, false)
+            return EmptyStateViewHolder(view)
+        }
+    }
+}
+
+
+class PokemonRosterDiffUtil : DiffUtil.ItemCallback<RosterItem>() {
 
     override fun areItemsTheSame(oldItem: RosterItem, newItem: RosterItem): Boolean {
-        if(oldItem is PokemonItem && newItem is PokemonItem){
+        if (oldItem is PokemonItem && newItem is PokemonItem) {
             return oldItem.id == newItem.id
         }
-        if(oldItem is GenerationListItem && newItem is GenerationListItem){
+        if (oldItem is GenerationListItem && newItem is GenerationListItem) {
             return oldItem.generationList == newItem.generationList
         }
-        if(oldItem is TypeListItem && newItem is TypeListItem) {
+        if (oldItem is TypeListItem && newItem is TypeListItem) {
             return oldItem.typeMap == newItem.typeMap
         }
         return false
     }
 
     override fun areContentsTheSame(oldItem: RosterItem, newItem: RosterItem): Boolean {
-        if(oldItem is PokemonItem && newItem is PokemonItem){
+        if (oldItem is PokemonItem && newItem is PokemonItem) {
             return oldItem == newItem
         }
-        if(oldItem is GenerationListItem && newItem is GenerationListItem){
+        if (oldItem is GenerationListItem && newItem is GenerationListItem) {
             return oldItem.generationList == newItem.generationList
         }
-        if(oldItem is TypeListItem && newItem is TypeListItem){
+        if (oldItem is TypeListItem && newItem is TypeListItem) {
             return oldItem.typeMap == newItem.typeMap
         }
         return false

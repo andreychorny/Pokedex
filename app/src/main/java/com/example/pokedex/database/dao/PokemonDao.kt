@@ -23,6 +23,10 @@ interface PokemonDao {
     fun getPokemonListByType(typeId: Long): List<DbPokemonBaseInfo>
 
     @Transaction
+    @Query("SELECT * FROM dbpokemonbaseinfo WHERE pokemonId IN (SELECT pokemonId FROM dbpokemondetail WHERE isLiked = 1)")
+    fun getLikedPokemonList(): List<DbPokemonBaseInfo>
+
+    @Transaction
     @Query("SELECT isLiked FROM dbpokemondetail WHERE pokemonId = :pokemonId")
     fun isPokemonLiked(pokemonId: Long): Boolean?
 

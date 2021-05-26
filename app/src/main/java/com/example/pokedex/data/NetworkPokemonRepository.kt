@@ -32,6 +32,7 @@ class NetworkPokemonRepository(
                 PokemonApiFilter.SHOW_ALL -> retrieveAllPokemon()
                 PokemonApiFilter.SHOW_GENERATION -> retrievePokemonByGeneration(generationId)
                 PokemonApiFilter.SHOW_TYPE -> retrievePokemonByType(typeId)
+                PokemonApiFilter.SHOW_LIKED -> retrieveLikedPokemon()
             }
         }
         return pokemons
@@ -90,6 +91,10 @@ class NetworkPokemonRepository(
 
     private fun retrieveAllPokemon(): List<PokemonEntity> {
         return database.pokemonDao.getPokemonList().map { it.asDomainEntity() }
+    }
+
+    private fun retrieveLikedPokemon(): List<PokemonEntity> {
+        return database.pokemonDao.getLikedPokemonList().map { it.asDomainEntity() }
     }
 
 

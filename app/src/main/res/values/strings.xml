@@ -8,4 +8,6 @@
     <string name="generations">Generations:</string>
     <string name="weight">Weight:</string>
     <string name="height">Height:</string>
+    <string name="liked">Liked</string>
+    <string name="empty_state_text">You have no liked pokemons yet!</string>
 </resources>

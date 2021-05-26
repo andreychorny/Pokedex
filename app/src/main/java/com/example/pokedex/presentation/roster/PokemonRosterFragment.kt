@@ -95,6 +95,7 @@ class PokemonRosterFragment : Fragment() {
             when (item.itemId) {
                 R.id.show_generation_menu -> PokemonApiFilter.SHOW_GENERATION
                 R.id.show_type_menu -> PokemonApiFilter.SHOW_TYPE
+                R.id.show_liked -> PokemonApiFilter.SHOW_LIKED
                 else -> PokemonApiFilter.SHOW_ALL
             }
         )
