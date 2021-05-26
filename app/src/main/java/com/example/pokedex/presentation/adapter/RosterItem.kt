@@ -10,13 +10,15 @@ class PokemonItem(
 ) : RosterItem()
 
 class GenerationListItem(
-        //list of ids
-        val generationList: List<Long>
+        //map of ids to names
+        val generationList: Map<Long,String>,
+        val checkedId: Long
 ) : RosterItem()
 
 class TypeListItem(
         //map of ids to names
-        val typeMap: Map<Long,String>
+        val typeMap: Map<Long,String>,
+        val checkedId: Long
 ) : RosterItem()
 
 object EmptyStateItem: RosterItem()

@@ -49,7 +49,7 @@ class PokemonRosterViewModel(private val repository: PokemonRepository) : ViewMo
         val resultList = mutableListOf<RosterItem>()
         if (filter == PokemonApiFilter.SHOW_GENERATION) {
             val generationList = repository.getGenerationsList()
-            resultList.add(GenerationListItem(generationList.map { it.id }))
+            resultList.add(GenerationListItem(generationList.map { it.id to it.name }.toMap(), currentGenerationId))
         }
         if (filter == PokemonApiFilter.SHOW_TYPE) {
             val typeList = repository.getTypesList()
@@ -58,8 +58,8 @@ class PokemonRosterViewModel(private val repository: PokemonRepository) : ViewMo
                 //by having much higher id than normal (currently it's 10001 and 10002)
                 //so here we need to remove them
                 .filter { it.id < 1000 }
-                .map { it.id to it.name }.toMap()
-            )
+                .map { it.id to it.name }.toMap(),
+            currentTypeId)
             )
         }
         val pokemons = repository.getPokemonList(filter, currentGenerationId, currentTypeId)
@@ -79,7 +79,8 @@ class PokemonRosterViewModel(private val repository: PokemonRepository) : ViewMo
         when (filter) {
             PokemonApiFilter.SHOW_GENERATION -> {
                 val generationList = repository.downloadGenerationList()
-                resultList.add(GenerationListItem(generationList.map { it.id }))
+                resultList.add(GenerationListItem(generationList.map { it.id to it.name }.toMap(),
+                currentGenerationId))
                 val pokemons = repository.downloadPokemonByGeneration(currentGenerationId)
                 resultList.addAll(pokemons.map { it.toItem() })
                 viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
@@ -91,8 +92,8 @@ class PokemonRosterViewModel(private val repository: PokemonRepository) : ViewMo
                     //by having much higher id than normal (currently it's 10001 and 10002)
                     //so here we need to remove them
                     .filter { it.id < 1000 }
-                    .map { it.id to it.name }.toMap()
-                )
+                    .map { it.id to it.name }.toMap(),
+                currentTypeId)
                 )
                 val pokemons = repository.downloadPokemonByType(currentTypeId)
                 resultList.addAll(pokemons.map { it.toItem() })

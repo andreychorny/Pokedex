@@ -103,7 +103,6 @@ class PokemonRosterAdapter(
         private val cardView = itemView.findViewById<MaterialCardView>(R.id.pokemonCard)
 
         fun bind(item: PokemonItem) {
-            nameView.text = item.name
             Glide.with(imageView.context)
                 .asBitmap()
                 .load(item.artImgUrl)
@@ -120,6 +119,7 @@ class PokemonRosterAdapter(
             itemView.setOnClickListener {
                 onItemClicked(item.id)
             }
+            nameView.text = item.name
         }
 
         private fun setBackgroundColor() = object : RequestListener<Bitmap> {
@@ -167,17 +167,14 @@ class PokemonRosterAdapter(
         private val chipGroup =
             itemView.findViewById<ChipGroup>(R.id.generationList)
 
-        private var isFirstChip = true
-
         fun bind(item: GenerationListItem) {
             val inflator = LayoutInflater.from(chipGroup.context)
-            val children = item.generationList.map { generationId ->
+            val children = item.generationList.map { (generationId: Long, generationName: String) ->
                 val chip = inflator.inflate(R.layout.generation_item, chipGroup, false) as Chip
                 chip.text = "Generation ${generationId.toString()}"
                 chip.tag = generationId
-                if (isFirstChip) {
+                if (item.checkedId == generationId) {
                     chip.isChecked = true
-                    isFirstChip = false
                 }
                 chip.setOnCheckedChangeListener { button, isChecked ->
                     if (isChecked) {
@@ -190,7 +187,6 @@ class PokemonRosterAdapter(
             for (chip in children) {
                 chipGroup.addView(chip)
             }
-            isFirstChip = true
         }
 
         companion object {
@@ -213,17 +209,14 @@ class PokemonRosterAdapter(
         private val chipGroup =
             itemView.findViewById<ChipGroup>(R.id.typeList)
 
-        private var isFirstChip = true
-
         fun bind(item: TypeListItem) {
             val inflator = LayoutInflater.from(chipGroup.context)
             val children = item.typeMap.map { (typeId: Long, typeName: String) ->
                 val chip = inflator.inflate(R.layout.type_item, chipGroup, false) as Chip
                 chip.text = typeName
                 chip.tag = typeId
-                if (isFirstChip) {
+                if (item.checkedId == typeId) {
                     chip.isChecked = true
-                    isFirstChip = false
                 }
                 chip.setOnCheckedChangeListener { button, isChecked ->
                     if (isChecked) {
@@ -236,7 +229,6 @@ class PokemonRosterAdapter(
             for (chip in children) {
                 chipGroup.addView(chip)
             }
-            isFirstChip = true
         }
 
         companion object {

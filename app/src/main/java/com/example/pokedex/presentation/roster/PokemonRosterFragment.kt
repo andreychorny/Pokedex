@@ -1,6 +1,7 @@
 package com.example.pokedex.presentation.roster
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -29,7 +30,6 @@ class PokemonRosterFragment : Fragment() {
         binding.lifecycleOwner = this
 
         initRecyclerView()
-
         binding.pokemonRoster.adapter = adapter
 
         pokemonRosterViewModel.viewState().observe(viewLifecycleOwner) { state ->
