@@ -3,8 +3,10 @@ package com.example.pokedex.presentation.roster
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pokedex.R
@@ -13,6 +15,7 @@ import com.example.pokedex.databinding.FragmentPokemonRosterBinding
 import com.example.pokedex.presentation.adapter.PokemonRosterAdapter
 import com.example.pokedex.presentation.adapter.RosterItem
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.transition.MaterialElevationScale
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PokemonRosterFragment : Fragment() {
@@ -85,6 +88,13 @@ class PokemonRosterFragment : Fragment() {
         })
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        postponeEnterTransition()
+        view.doOnPreDraw { startPostponedEnterTransition() }
+
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.overflow_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
@@ -104,10 +114,19 @@ class PokemonRosterFragment : Fragment() {
 
     private fun initRecyclerView() {
         adapter = PokemonRosterAdapter(
-            onPokemonItemClicked = { id: Long ->
+            onPokemonItemClicked = { id: Long, view: View ->
+                exitTransition = MaterialElevationScale(false).apply {
+                    duration = 500L
+                }
+                reenterTransition = MaterialElevationScale(true).apply {
+                    duration = 500L
+                }
+
+                val detailCardTransitionName = getString(R.string.string_transition)
+                val extras = FragmentNavigatorExtras(view to detailCardTransitionName)
                 this.findNavController().navigate(
                     PokemonRosterFragmentDirections
-                        .actionPokemonRosterFragmentToPokemonDetailFragment(id)
+                        .actionPokemonRosterFragmentToPokemonDetailFragment(id), extras
                 )
             },
             onGenerationItemClicked = { id: Long, isChecked: Boolean ->

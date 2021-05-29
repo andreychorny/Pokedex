@@ -19,6 +19,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.example.pokedex.R
+import com.example.pokedex.databinding.PokemonItemBinding
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
@@ -30,7 +31,7 @@ private const val ITEM_TYPE_TYPE_LIST = 3
 private const val ITEM_TYPE_EMPTY_STATE = 4
 
 class PokemonRosterAdapter(
-    private val onPokemonItemClicked: (id: Long) -> Unit,
+    private val onPokemonItemClicked: (id: Long, cardView: View) -> Unit,
     private val onGenerationItemClicked: (id: Long, isChecked: Boolean) -> Unit,
     private val onTypeItemClicked: (id: Long, isChecked: Boolean) -> Unit
 ) : ListAdapter<RosterItem, RecyclerView.ViewHolder>(PokemonRosterDiffUtil()) {
@@ -91,174 +92,6 @@ class PokemonRosterAdapter(
                     is EmptyStateItem -> 2
                 }
             }
-        }
-    }
-
-    class PokemonViewHolder(
-        view: View, val onItemClicked: (id: Long) -> Unit
-    ) : RecyclerView.ViewHolder(view) {
-
-        private val nameView = itemView.findViewById<TextView>(R.id.pokemonName)
-        private val imageView = itemView.findViewById<ImageView>(R.id.pokemonImage)
-        private val cardView = itemView.findViewById<MaterialCardView>(R.id.pokemonCard)
-
-        fun bind(item: PokemonItem) {
-            Glide.with(imageView.context)
-                .asBitmap()
-                .load(item.artImgUrl)
-//                    in case of error, we try download another sprite image, as some pokemons don't have
-//                    official art pic
-                .error(
-                    Glide
-                        .with(imageView.context)
-                        .asBitmap()
-                        .load(item.spriteImgUrl)
-                        .listener(setBackgroundColor())
-                ).listener(setBackgroundColor())
-                .into(imageView)
-            itemView.setOnClickListener {
-                onItemClicked(item.id)
-            }
-            nameView.text = item.name
-        }
-
-        private fun setBackgroundColor() = object : RequestListener<Bitmap> {
-            override fun onLoadFailed(
-                e: GlideException?,
-                model: Any?,
-                target: Target<Bitmap>?,
-                isFirstResource: Boolean
-            ): Boolean {
-                return false
-            }
-
-            override fun onResourceReady(
-                resource: Bitmap?,
-                model: Any?,
-                target: Target<Bitmap>?,
-                dataSource: DataSource?,
-                isFirstResource: Boolean
-            ): Boolean {
-                resource?.let {
-                    val palette = Palette.from(it).generate()
-                    cardView.setBackgroundColor(palette.getLightMutedColor(Color.CYAN))
-                    nameView.setTextColor(palette.getDarkVibrantColor(Color.BLACK))
-                }
-                return false
-            }
-
-        }
-
-        companion object {
-            fun from(parent: ViewGroup, onItemClicked: (id: Long) -> Unit): PokemonViewHolder {
-                val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.pokemon_item, parent, false)
-
-                return PokemonViewHolder(view, onItemClicked)
-            }
-        }
-    }
-
-    class GenerationListViewHolder(
-        view: View,
-        val onItemClicked: (id: Long, isChecked: Boolean) -> Unit
-    ) : RecyclerView.ViewHolder(view) {
-
-        private val chipGroup =
-            itemView.findViewById<ChipGroup>(R.id.generationList)
-
-        fun bind(item: GenerationListItem) {
-            val inflator = LayoutInflater.from(chipGroup.context)
-            val children = item.generationList.map { (generationId: Long, generationName: String) ->
-                val chip = inflator.inflate(R.layout.generation_item, chipGroup, false) as Chip
-                chip.text = "Generation ${generationId.toString()}"
-                chip.tag = generationId
-                if (item.checkedId == generationId) {
-                    chip.isChecked = true
-                }
-                chip.setOnCheckedChangeListener { button, isChecked ->
-                    if (isChecked) {
-                        onItemClicked(button.tag as Long, isChecked)
-                    }
-                }
-                chip
-            }
-            chipGroup.removeAllViews()
-            for (chip in children) {
-                chipGroup.addView(chip)
-            }
-        }
-
-        companion object {
-            fun from(
-                parent: ViewGroup,
-                onItemClicked: (id: Long, isChecked: Boolean) -> Unit
-            ): GenerationListViewHolder {
-                val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.generation_list, parent, false)
-                return GenerationListViewHolder(view, onItemClicked)
-            }
-        }
-    }
-
-    class TypeListViewHolder(
-        view: View,
-        val onItemClicked: (id: Long, isChecked: Boolean) -> Unit
-    ) : RecyclerView.ViewHolder(view) {
-
-        private val chipGroup =
-            itemView.findViewById<ChipGroup>(R.id.typeList)
-
-        fun bind(item: TypeListItem) {
-            val inflator = LayoutInflater.from(chipGroup.context)
-            val children = item.typeMap.map { (typeId: Long, typeName: String) ->
-                val chip = inflator.inflate(R.layout.type_item, chipGroup, false) as Chip
-                chip.text = typeName
-                chip.tag = typeId
-                if (item.checkedId == typeId) {
-                    chip.isChecked = true
-                }
-                chip.setOnCheckedChangeListener { button, isChecked ->
-                    if (isChecked) {
-                        onItemClicked(button.tag as Long, isChecked)
-                    }
-                }
-                chip
-            }
-            chipGroup.removeAllViews()
-            for (chip in children) {
-                chipGroup.addView(chip)
-            }
-        }
-
-        companion object {
-            fun from(
-                parent: ViewGroup,
-                onItemClicked: (id: Long, isChecked: Boolean) -> Unit
-            ): TypeListViewHolder {
-                val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.type_list, parent, false)
-                return TypeListViewHolder(view, onItemClicked)
-            }
-        }
-    }
-}
-
-class EmptyStateViewHolder(
-    view: View,
-) : RecyclerView.ViewHolder(view) {
-
-
-    fun bind(item: EmptyStateItem) {
-    }
-
-    companion object {
-        fun from(
-            parent: ViewGroup,
-        ): EmptyStateViewHolder {
-            val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.empty_state_item, parent, false)
-            return EmptyStateViewHolder(view)
         }
     }
 }
