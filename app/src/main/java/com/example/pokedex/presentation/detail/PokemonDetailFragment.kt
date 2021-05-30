@@ -83,6 +83,18 @@ class PokemonDetailFragment : Fragment() {
         binding.pokemonDetailName.text = pokemonDetail.name
         binding.pokemonHeight.text = pokemonDetail.height.toString()
         binding.pokemonWeight.text = pokemonDetail.weight.toString()
+        setImage(pokemonDetail)
+        setTypeChipGroup(pokemonDetail)
+        binding.hpIndicator.progress = pokemonDetail.stats["hp"] ?: 0
+        binding.attackIndicator.progress = pokemonDetail.stats["attack"] ?: 0
+        binding.defenseIndicator.progress = pokemonDetail.stats["defense"] ?: 0
+        binding.specialAttackIndicator.progress = pokemonDetail.stats["special-attack"] ?: 0
+        binding.specialDefenseIndicator.progress = pokemonDetail.stats["special-defense"] ?: 0
+        binding.speedIndicator.progress = pokemonDetail.stats["speed"] ?: 0
+
+    }
+
+    private fun setImage(pokemonDetail: PokemonDetailEntity) {
         Glide.with(binding.pokemonImage.context)
             .asBitmap()
             .load(pokemonDetail.officialArtworkUrl)
@@ -101,8 +113,6 @@ class PokemonDetailFragment : Fragment() {
             pokemonDetailViewModel.updateLiked(pokemonDetail)
             updateLikeImg(pokemonDetail.isLiked.not())
         }
-
-        setTypeChipGroup(pokemonDetail)
     }
 
     private fun setTypeChipGroup(pokemonDetail: PokemonDetailEntity) {
