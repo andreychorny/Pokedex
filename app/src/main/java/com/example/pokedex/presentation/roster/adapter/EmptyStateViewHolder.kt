@@ -1,4 +1,4 @@
-package com.example.pokedex.presentation.adapter
+package com.example.pokedex.presentation.roster.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +9,6 @@ import com.example.pokedex.R
 class EmptyStateViewHolder(
     view: View,
 ) : RecyclerView.ViewHolder(view) {
-
 
     fun bind(item: EmptyStateItem) {
     }

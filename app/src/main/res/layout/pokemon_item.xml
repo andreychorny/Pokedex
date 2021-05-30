@@ -19,6 +19,7 @@
 
             <ImageView
                 android:id="@+id/pokemonImage"
+                android:transitionGroup="true"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
                 app:layout_constraintBottom_toTopOf="@+id/pokemonName"

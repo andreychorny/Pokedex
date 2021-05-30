@@ -17,10 +17,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
-class NetworkPokemonRepository(
+class NetworkCacheablePokemonRepository(
     private val api: PokemonRosterService,
     private val database: PokedexDatabase
-) : PokemonRepository {
+) : CacheablePokemonRepository {
 
     override suspend fun getPokemonList(
         filter: PokemonApiFilter,

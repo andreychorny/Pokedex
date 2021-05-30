@@ -15,7 +15,7 @@
         <item name="android:fontFamily">@font/aclonica</item>
         <item name="fontFamily">@font/aclonica</item>
     </style>
-    <style name="TextAppearance.DescriptionHeadline6" parent="TextAppearance.MaterialComponents.Headline6">
+    <style name="TextAppearance.DescriptionHeadline5" parent="TextAppearance.MaterialComponents.Headline5">
         <item name="android:fontFamily">sans-serif</item>
         <item name="fontFamily">sans-serif</item>
     </style>

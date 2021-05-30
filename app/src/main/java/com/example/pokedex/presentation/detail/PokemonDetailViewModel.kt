@@ -2,7 +2,7 @@ package com.example.pokedex.presentation.detail
 
 import androidx.lifecycle.*
 import com.example.pokedex.domain.PokemonDetailEntity
-import com.example.pokedex.domain.PokemonRepository
+import com.example.pokedex.domain.CacheablePokemonRepository
 import com.example.pokedex.domain.asDatabaseEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -11,7 +11,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.collect
 import java.lang.Exception
 
-class PokemonDetailViewModel(private val repository: PokemonRepository): ViewModel() {
+class PokemonDetailViewModel(private val repositoryCacheable: CacheablePokemonRepository): ViewModel() {
 
     private val viewStateLiveData = MutableLiveData<PokemonDetailViewState>()
     fun viewState(): LiveData<PokemonDetailViewState> = viewStateLiveData
@@ -25,7 +25,7 @@ class PokemonDetailViewModel(private val repository: PokemonRepository): ViewMod
     private fun loadDetailFromDatabase(id: Long) {
         viewModelScope.launch {
             viewStateLiveData.value = PokemonDetailViewState.Loading
-            repository.getPokemonById(id).collect { detail ->
+            repositoryCacheable.getPokemonById(id).collect { detail ->
                 detail?.let {
                     viewStateLiveData.value = PokemonDetailViewState.Data(it)
                 }
@@ -37,7 +37,7 @@ class PokemonDetailViewModel(private val repository: PokemonRepository): ViewMod
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
-                    repository.downloadPokemonDetail(id)
+                    repositoryCacheable.downloadPokemonDetail(id)
                 } catch (e: Exception) {
                     viewStateLiveData.postValue(PokemonDetailViewState.Error("Network error"))
                 }
@@ -50,7 +50,7 @@ class PokemonDetailViewModel(private val repository: PokemonRepository): ViewMod
             withContext(Dispatchers.IO) {
                 pokemonDetail.let {
                     val newIsLiked = it.isLiked.not()
-                    repository.updatePokemonInDatabase(
+                    repositoryCacheable.updatePokemonInDatabase(
                         it.asDatabaseEntity(newIsLiked)
                     )
                 }

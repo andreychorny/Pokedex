@@ -1,4 +1,4 @@
-package com.example.pokedex.presentation.adapter
+package com.example.pokedex.presentation.roster.adapter
 
 import android.view.LayoutInflater
 import android.view.View

@@ -6,19 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pokedex.data.network.PokemonApiFilter
 import com.example.pokedex.domain.PokemonEntity
-import com.example.pokedex.domain.PokemonRepository
-import com.example.pokedex.presentation.adapter.*
-import com.example.pokedex.presentation.detail.PokemonDetailViewState
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.map
+import com.example.pokedex.domain.CacheablePokemonRepository
+import com.example.pokedex.presentation.roster.adapter.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.lang.Exception
 
-class PokemonRosterViewModel(private val repository: PokemonRepository) : ViewModel() {
+class PokemonRosterViewModel(private val repositoryCacheable: CacheablePokemonRepository) : ViewModel() {
 
     private val viewStateLiveData = MutableLiveData<PokemonRosterViewState>()
     fun viewState(): LiveData<PokemonRosterViewState> = viewStateLiveData
@@ -48,11 +41,11 @@ class PokemonRosterViewModel(private val repository: PokemonRepository) : ViewMo
     private suspend fun loadFromDatabase() {
         val resultList = mutableListOf<RosterItem>()
         if (filter == PokemonApiFilter.SHOW_GENERATION) {
-            val generationList = repository.getGenerationsList()
+            val generationList = repositoryCacheable.getGenerationsList()
             resultList.add(GenerationListItem(generationList.map { it.id to it.name }.toMap(), currentGenerationId))
         }
         if (filter == PokemonApiFilter.SHOW_TYPE) {
-            val typeList = repository.getTypesList()
+            val typeList = repositoryCacheable.getTypesList()
             resultList.add(TypeListItem(typeList
                 //backend contains empty dummy types with no pokemons. Those types are secluded
                 //by having much higher id than normal (currently it's 10001 and 10002)
@@ -62,7 +55,7 @@ class PokemonRosterViewModel(private val repository: PokemonRepository) : ViewMo
             currentTypeId)
             )
         }
-        val pokemons = repository.getPokemonList(filter, currentGenerationId, currentTypeId)
+        val pokemons = repositoryCacheable.getPokemonList(filter, currentGenerationId, currentTypeId)
         if(pokemons.isNotEmpty()){
             resultList.addAll(pokemons.map { it.toItem() })
             viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
@@ -78,15 +71,15 @@ class PokemonRosterViewModel(private val repository: PokemonRepository) : ViewMo
         val resultList = mutableListOf<RosterItem>()
         when (filter) {
             PokemonApiFilter.SHOW_GENERATION -> {
-                val generationList = repository.downloadGenerationList()
+                val generationList = repositoryCacheable.downloadGenerationList()
                 resultList.add(GenerationListItem(generationList.map { it.id to it.name }.toMap(),
                 currentGenerationId))
-                val pokemons = repository.downloadPokemonByGeneration(currentGenerationId)
+                val pokemons = repositoryCacheable.downloadPokemonByGeneration(currentGenerationId)
                 resultList.addAll(pokemons.map { it.toItem() })
                 viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
             }
             PokemonApiFilter.SHOW_TYPE -> {
-                val typeList = repository.downloadTypeList()
+                val typeList = repositoryCacheable.downloadTypeList()
                 resultList.add(TypeListItem(typeList
                     //backend contains empty dummy types with no pokemons. Those types are secluded
                     //by having much higher id than normal (currently it's 10001 and 10002)
@@ -95,12 +88,12 @@ class PokemonRosterViewModel(private val repository: PokemonRepository) : ViewMo
                     .map { it.id to it.name }.toMap(),
                 currentTypeId)
                 )
-                val pokemons = repository.downloadPokemonByType(currentTypeId)
+                val pokemons = repositoryCacheable.downloadPokemonByType(currentTypeId)
                 resultList.addAll(pokemons.map { it.toItem() })
                 viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
             }
             PokemonApiFilter.SHOW_ALL -> {
-                val pokemons = repository.downloadAllPokemon()
+                val pokemons = repositoryCacheable.downloadAllPokemon()
                 resultList.addAll(pokemons.map { it.toItem() })
                 viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
             }

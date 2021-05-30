@@ -1,4 +1,4 @@
-package com.example.pokedex.presentation.adapter
+package com.example.pokedex.presentation.roster.adapter
 
 sealed class RosterItem
 

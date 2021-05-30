@@ -2,10 +2,10 @@ package com.example.pokedex.data.di
 
 import android.app.Application
 import androidx.room.Room
-import com.example.pokedex.data.NetworkPokemonRepository
+import com.example.pokedex.data.NetworkCacheablePokemonRepository
 import com.example.pokedex.data.network.PokemonRosterService
 import com.example.pokedex.database.PokedexDatabase
-import com.example.pokedex.domain.PokemonRepository
+import com.example.pokedex.domain.CacheablePokemonRepository
 import com.example.pokedex.presentation.detail.PokemonDetailViewModel
 import com.example.pokedex.presentation.roster.PokemonRosterViewModel
 import com.squareup.moshi.Moshi
@@ -22,7 +22,7 @@ private const val BASE_URL =
 
 val appModule = module {
     single<PokemonRosterService> { createPokedexApiService() }
-    single<PokemonRepository> { NetworkPokemonRepository(get(),get()) }
+    single<CacheablePokemonRepository> { NetworkCacheablePokemonRepository(get(),get()) }
     single{ provideDatabase(androidApplication())}
     viewModel { PokemonRosterViewModel(get()) }
     viewModel { PokemonDetailViewModel(get()) }

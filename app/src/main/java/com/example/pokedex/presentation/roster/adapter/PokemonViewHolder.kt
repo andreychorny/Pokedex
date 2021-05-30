@@ -1,4 +1,4 @@
-package com.example.pokedex.presentation.adapter
+package com.example.pokedex.presentation.roster.adapter
 
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -61,7 +61,7 @@ class PokemonViewHolder(
         ): Boolean {
             resource?.let {
                 val palette = Palette.from(it).generate()
-                binding.pokemonCard.setBackgroundColor(palette.getLightMutedColor(Color.WHITE))
+                binding.pokemonCard.setBackgroundColor(palette.getLightMutedColor(Color.LTGRAY))
                 binding.pokemonName.setTextColor(palette.getDarkVibrantColor(Color.BLACK))
             }
             return false

@@ -17,4 +17,49 @@
     <color name="primaryTextColor">#ffffff</color>
     <color name="secondaryTextColor">#ffffff</color>
 
+    <!-- KEEP CORRESPONDENCE OF INDEXES BETWEEN THIS ARRAY AND "typeNames" ARRAY!!!  -->
+    <array name="typesColors">
+        <item name="normal">#AEB3A2</item>
+        <item name="fighting">#FF9E80</item>
+        <item name="flying">#D6E2EC</item>
+        <item name="poison">#B388FF</item>
+        <item name="ground">#FFE57F</item>
+        <item name="rock">#FFAB40</item>
+        <item name="bug">#B2FF59</item>
+        <item name="ghost">#EA80FC</item>
+        <item name="steel">#9E9D9A</item>
+        <item name="fire">#FF5252</item>
+        <item name="water">#448AFF</item>
+        <item name="grass">#00E676</item>
+        <item name="electric">#FFFF00</item>
+        <item name="psychic">#FF80AB</item>
+        <item name="ice">#84FFFF</item>
+        <item name="dragon">#FF8A80</item>
+        <item name="dark">#8C8A7C</item>
+        <item name="fairy">#FF4081</item>
+    </array>
+    <!-- KEEP CORRESPONDENCE OF INDEXES BETWEEN THIS ARRAY AND "typesColors" ARRAY!!!  -->
+    <array name="typeNames">
+        <item>normal</item>
+        <item>fighting</item>
+        <item>flying</item>
+        <item>poison</item>
+        <item>ground</item>
+        <item>rock</item>
+        <item>bug</item>
+        <item>ghost</item>
+        <item>steel</item>
+        <item>fire</item>
+        <item>water</item>
+        <item>grass</item>
+        <item>electric</item>
+        <item>psychic</item>
+        <item>ice</item>
+        <item>dragon</item>
+        <item>dark</item>
+        <item>fairy</item>
+    </array>
+
+    <color name="otherType">#FFE57F</color>
+
 </resources>

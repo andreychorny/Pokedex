@@ -1,7 +1,6 @@
 package com.example.pokedex.presentation.roster
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
@@ -12,8 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.pokedex.R
 import com.example.pokedex.data.network.PokemonApiFilter
 import com.example.pokedex.databinding.FragmentPokemonRosterBinding
-import com.example.pokedex.presentation.adapter.PokemonRosterAdapter
-import com.example.pokedex.presentation.adapter.RosterItem
+import com.example.pokedex.presentation.roster.adapter.PokemonRosterAdapter
+import com.example.pokedex.presentation.roster.adapter.RosterItem
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialElevationScale
 import org.koin.androidx.viewmodel.ext.android.viewModel

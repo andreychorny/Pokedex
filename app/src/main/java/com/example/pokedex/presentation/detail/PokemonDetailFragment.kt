@@ -1,14 +1,13 @@
 package com.example.pokedex.presentation.detail
 
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
-import android.transition.TransitionInflater
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.palette.graphics.Palette
@@ -20,6 +19,7 @@ import com.bumptech.glide.request.target.Target
 import com.example.pokedex.R
 import com.example.pokedex.databinding.FragmentPokemonDetailBinding
 import com.example.pokedex.domain.PokemonDetailEntity
+import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialContainerTransform
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -31,7 +31,7 @@ class PokemonDetailFragment : Fragment() {
     private var _binding: FragmentPokemonDetailBinding? = null
     private val binding get() = _binding!!
 
-    override fun onCreate(savedInstanceState: Bundle?)  {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         //TODO FIX CHANGING BACKGROUND COLOR OF CARD
@@ -55,6 +55,7 @@ class PokemonDetailFragment : Fragment() {
         pokemonDetailViewModel.viewState().observe(viewLifecycleOwner, { state ->
             when (state) {
                 is PokemonDetailViewState.Loading -> {
+                    showProgress()
                 }
                 is PokemonDetailViewState.Data -> {
                     showData(state.detail)
@@ -73,7 +74,11 @@ class PokemonDetailFragment : Fragment() {
         pokemonDetail: PokemonDetailEntity
     ) {
         binding.detailProgressBar.isVisible = false
-        binding.detailViewGroup.isVisible = true
+        binding.pokemonDetailName.isVisible = true
+        binding.likeImage.isVisible = true
+        binding.pokemonWeight.isVisible = true
+        binding.pokemonHeight.isVisible = true
+        binding.detailTypeList.isVisible = true
 
         binding.pokemonDetailName.text = pokemonDetail.name
         binding.pokemonHeight.text = pokemonDetail.height.toString()
@@ -96,7 +101,34 @@ class PokemonDetailFragment : Fragment() {
             pokemonDetailViewModel.updateLiked(pokemonDetail)
             updateLikeImg(pokemonDetail.isLiked.not())
         }
+
+        setTypeChipGroup(pokemonDetail)
     }
+
+    private fun setTypeChipGroup(pokemonDetail: PokemonDetailEntity) {
+        val colors = resources.getIntArray(R.array.typesColors)
+        val typeNames = resources.getStringArray(R.array.typeNames)
+        val chipGroup = binding.detailTypeList
+        val inflator = LayoutInflater.from(chipGroup.context)
+        val children = pokemonDetail.types.map { typeName ->
+            val chip = inflator.inflate(R.layout.detail_type_chip, chipGroup, false) as Chip
+            chip.text = typeName
+            chip.tag = typeName
+            var backgroundColor = R.color.otherType
+            val index = typeNames.indexOf(typeName)
+            if( index > -1 ){
+                backgroundColor = colors[index]
+            }
+            chip.chipBackgroundColor = ColorStateList.valueOf(backgroundColor)
+            chip
+        }
+        chipGroup.removeAllViews()
+
+        for (chip in children) {
+            chipGroup.addView(chip)
+        }
+    }
+
 
     private fun setBackgroundColor() = object : RequestListener<Bitmap> {
         override fun onLoadFailed(
@@ -133,10 +165,15 @@ class PokemonDetailFragment : Fragment() {
         }
     }
 
-
     private fun showProgress() {
+        //I hide views selectively as hiding pokemon image breaks transition animation
         binding.detailProgressBar.isVisible = true
-        binding.detailViewGroup.isVisible = false
+        binding.pokemonDetailName.isVisible = false
+        binding.likeImage.isVisible = false
+        binding.pokemonWeight.isVisible = false
+        binding.pokemonHeight.isVisible = false
+        binding.detailTypeList.isVisible = false
+
     }
 
     @InternalCoroutinesApi
