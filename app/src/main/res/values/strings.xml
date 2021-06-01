@@ -12,4 +12,9 @@
     <string name="empty_state_text">You have no liked pokemons yet!</string>
     <string name="string_transition">shared_element_container</string>
     <string name="hp">HP</string>
+    <string name="attack">ATK</string>
+    <string name="defense">DEF</string>
+    <string name="special_attack">SP.ATK</string>
+    <string name="special_defense">SP.DEF</string>
+    <string name="speed">SPD</string>
 </resources>

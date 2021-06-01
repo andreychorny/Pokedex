@@ -3,10 +3,12 @@ package com.example.pokedex.presentation.detail
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -22,6 +24,7 @@ import com.example.pokedex.domain.PokemonDetailEntity
 import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialContainerTransform
+import com.google.android.material.transition.MaterialElevationScale
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlinx.coroutines.InternalCoroutinesApi
 
@@ -34,12 +37,17 @@ class PokemonDetailFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //TODO FIX CHANGING BACKGROUND COLOR OF CARD
+        //TODO FIX CHANGING BACKGROUND COLOR OF CARD AND FLICKERING
         sharedElementEnterTransition = MaterialContainerTransform().apply {
             drawingViewId = R.id.pokemonHostFragment
             duration = 500L
             scrimColor = Color.TRANSPARENT
         }
+//        OPTION №2 WITHOUT FIX:
+//        sharedElementEnterTransition = MaterialElevationScale(true).apply {
+//            duration = 500L
+//        }
+
     }
 
     @InternalCoroutinesApi
@@ -161,7 +169,13 @@ class PokemonDetailFragment : Fragment() {
                 val palette = Palette.from(it).generate()
                 binding.pokemonDetailCard.setBackgroundColor(palette.getLightMutedColor(Color.WHITE))
                 binding.pokemonDetailName.setTextColor(palette.getDarkVibrantColor(Color.BLACK))
+
+//                SETING APPBAR COLOR THE SAME AS BACKGROUND FOR PICTURE
+//                (activity as AppCompatActivity).supportActionBar?.setBackgroundDrawable(
+//                    ColorDrawable(palette.getLightMutedColor(Color.WHITE))
+//                )
             }
+
             return false
         }
 

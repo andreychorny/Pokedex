@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.pokedex.R
 import com.example.pokedex.data.network.PokemonApiFilter
 import com.example.pokedex.databinding.FragmentPokemonRosterBinding
+import com.example.pokedex.presentation.roster.adapter.MarginItemDecoration
 import com.example.pokedex.presentation.roster.adapter.PokemonRosterAdapter
 import com.example.pokedex.presentation.roster.adapter.RosterItem
 import com.google.android.material.snackbar.Snackbar
@@ -33,7 +34,7 @@ class PokemonRosterFragment : Fragment() {
 
         initRecyclerView()
         binding.pokemonRoster.adapter = adapter
-
+        binding.pokemonRoster.addItemDecoration(MarginItemDecoration(16, 2))
         pokemonRosterViewModel.viewState().observe(viewLifecycleOwner) { state ->
             when (state) {
                 is PokemonRosterViewState.Loading -> {

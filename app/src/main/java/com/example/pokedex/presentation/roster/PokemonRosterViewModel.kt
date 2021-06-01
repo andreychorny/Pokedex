@@ -41,19 +41,10 @@ class PokemonRosterViewModel(private val repositoryCacheable: CacheablePokemonRe
     private suspend fun loadFromDatabase() {
         val resultList = mutableListOf<RosterItem>()
         if (filter == PokemonApiFilter.SHOW_GENERATION) {
-            val generationList = repositoryCacheable.getGenerationsList()
-            resultList.add(GenerationListItem(generationList.map { it.id to it.name }.toMap(), currentGenerationId))
+            loadGenerationsFromDatabase(resultList)
         }
         if (filter == PokemonApiFilter.SHOW_TYPE) {
-            val typeList = repositoryCacheable.getTypesList()
-            resultList.add(TypeListItem(typeList
-                //backend contains empty dummy types with no pokemons. Those types are secluded
-                //by having much higher id than normal (currently it's 10001 and 10002)
-                //so here we need to remove them
-                .filter { it.id < 1000 }
-                .map { it.id to it.name }.toMap(),
-            currentTypeId)
-            )
+            loadTypesFromDatabase(resultList)
         }
         val pokemons = repositoryCacheable.getPokemonList(filter, currentGenerationId, currentTypeId)
         if(pokemons.isNotEmpty()){
@@ -67,27 +58,40 @@ class PokemonRosterViewModel(private val repositoryCacheable: CacheablePokemonRe
         }
     }
 
+    private suspend fun loadTypesFromDatabase(resultList: MutableList<RosterItem>) {
+        val typeList = repositoryCacheable.getTypesList()
+        resultList.add(TypeListItem(typeList
+            //backend contains empty dummy types with no pokemons. Those types are secluded
+            //by having much higher id (currently it's 10001 and 10002)
+            //so here we need to remove them
+            .filter { it.id < 1000 }
+            .map { it.id to it.name }.toMap(),
+            currentTypeId
+        )
+        )
+    }
+
+    private suspend fun loadGenerationsFromDatabase(resultList: MutableList<RosterItem>) {
+        val generationList = repositoryCacheable.getGenerationsList()
+        resultList.add(
+            GenerationListItem(
+                generationList.map { it.id to it.name }.toMap(),
+                currentGenerationId
+            )
+        )
+    }
+
     private suspend fun loadRosterFromNet() {
         val resultList = mutableListOf<RosterItem>()
         when (filter) {
             PokemonApiFilter.SHOW_GENERATION -> {
-                val generationList = repositoryCacheable.downloadGenerationList()
-                resultList.add(GenerationListItem(generationList.map { it.id to it.name }.toMap(),
-                currentGenerationId))
+                loadGenerationsFromNet(resultList)
                 val pokemons = repositoryCacheable.downloadPokemonByGeneration(currentGenerationId)
                 resultList.addAll(pokemons.map { it.toItem() })
                 viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
             }
             PokemonApiFilter.SHOW_TYPE -> {
-                val typeList = repositoryCacheable.downloadTypeList()
-                resultList.add(TypeListItem(typeList
-                    //backend contains empty dummy types with no pokemons. Those types are secluded
-                    //by having much higher id than normal (currently it's 10001 and 10002)
-                    //so here we need to remove them
-                    .filter { it.id < 1000 }
-                    .map { it.id to it.name }.toMap(),
-                currentTypeId)
-                )
+                loadTypesFromNet(resultList)
                 val pokemons = repositoryCacheable.downloadPokemonByType(currentTypeId)
                 resultList.addAll(pokemons.map { it.toItem() })
                 viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
@@ -101,6 +105,29 @@ class PokemonRosterViewModel(private val repositoryCacheable: CacheablePokemonRe
                 loadFromDatabase()
             }
         }
+    }
+
+    private suspend fun loadTypesFromNet(resultList: MutableList<RosterItem>) {
+        val typeList = repositoryCacheable.downloadTypeList()
+        resultList.add(TypeListItem(typeList
+            //backend contains empty dummy types with no pokemons. Those types are secluded
+            //by having much higher id than normal (currently it's 10001 and 10002)
+            //so here we need to remove them
+            .filter { it.id < 1000 }
+            .map { it.id to it.name }.toMap(),
+            currentTypeId
+        )
+        )
+    }
+
+    private suspend fun loadGenerationsFromNet(resultList: MutableList<RosterItem>) {
+        val generationList = repositoryCacheable.downloadGenerationList()
+        resultList.add(
+            GenerationListItem(
+                generationList.map { it.id to it.name }.toMap(),
+                currentGenerationId
+            )
+        )
     }
 
     fun updateGenerationId(id: Long) {

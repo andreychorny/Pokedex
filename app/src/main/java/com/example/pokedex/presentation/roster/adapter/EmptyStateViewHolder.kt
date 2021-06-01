@@ -11,6 +11,7 @@ class EmptyStateViewHolder(
 ) : RecyclerView.ViewHolder(view) {
 
     fun bind(item: EmptyStateItem) {
+        //Nothing to bind, EmptyState view contains all information
     }
 
     companion object {
