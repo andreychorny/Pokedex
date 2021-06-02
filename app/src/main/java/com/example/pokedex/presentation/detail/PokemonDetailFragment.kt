@@ -8,8 +8,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.palette.graphics.Palette
@@ -24,7 +22,6 @@ import com.example.pokedex.domain.PokemonDetailEntity
 import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialContainerTransform
-import com.google.android.material.transition.MaterialElevationScale
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlinx.coroutines.InternalCoroutinesApi
 
@@ -39,7 +36,6 @@ class PokemonDetailFragment : Fragment() {
 
         //TODO FIX CHANGING BACKGROUND COLOR OF CARD AND FLICKERING
         sharedElementEnterTransition = MaterialContainerTransform().apply {
-            drawingViewId = R.id.pokemonHostFragment
             duration = 500L
             scrimColor = Color.TRANSPARENT
         }
