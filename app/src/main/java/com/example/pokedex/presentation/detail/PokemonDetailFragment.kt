@@ -47,6 +47,13 @@ class PokemonDetailFragment : Fragment() {
 
     }
 
+    override fun onPause() {
+        super.onPause()
+        val window = activity?.window
+        window?.statusBarColor = resources.getColor(R.color.primaryLightColor)
+
+    }
+
     @InternalCoroutinesApi
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -87,6 +94,12 @@ class PokemonDetailFragment : Fragment() {
         binding.pokemonWeight.isVisible = true
         binding.pokemonHeight.isVisible = true
         binding.detailTypeList.isVisible = true
+        binding.hpIndicator.isVisible = true
+        binding.attackIndicator.isVisible = true
+        binding.defenseIndicator.isVisible = true
+        binding.specialAttackIndicator.isVisible = true
+        binding.specialDefenseIndicator.isVisible = true
+        binding.speedIndicator.isVisible = true
 
         binding.pokemonDetailName.text = pokemonDetail.name
         binding.pokemonHeight.text = pokemonDetail.height.toString()
@@ -195,6 +208,13 @@ class PokemonDetailFragment : Fragment() {
         binding.pokemonWeight.isVisible = false
         binding.pokemonHeight.isVisible = false
         binding.detailTypeList.isVisible = false
+
+        binding.hpIndicator.isVisible = false
+        binding.attackIndicator.isVisible = false
+        binding.defenseIndicator.isVisible = false
+        binding.specialAttackIndicator.isVisible = false
+        binding.specialDefenseIndicator.isVisible = false
+        binding.speedIndicator.isVisible = false
 
     }
 

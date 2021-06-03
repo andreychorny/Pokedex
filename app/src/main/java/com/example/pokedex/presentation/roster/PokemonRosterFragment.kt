@@ -1,5 +1,6 @@
 package com.example.pokedex.presentation.roster
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.Toolbar

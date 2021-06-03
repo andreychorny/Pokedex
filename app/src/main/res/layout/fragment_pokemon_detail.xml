@@ -14,13 +14,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <ProgressBar
-                android:id="@+id/detailProgressBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:visibility="gone" />
-
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/detailViewGroup"
                 android:layout_width="match_parent"
@@ -175,24 +168,28 @@
                     android:id="@+id/hpText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
                     android:layout_marginTop="12dp"
                     android:text="@string/hp"
                     android:textSize="18sp"
+                    app:autoSizeTextType="uniform"
+
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/pokemonHeight" />
+                    app:layout_constraintTop_toBottomOf="@+id/pokemonHeight"
+                    app:layout_constraintEnd_toStartOf="@+id/hpIndicator"
+                    />
 
                 <com.google.android.material.progressindicator.LinearProgressIndicator
                     android:id="@+id/hpIndicator"
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginTop="18dp"
                     app:indicatorColor="@android:color/holo_red_dark"
+                    app:layout_constraintBottom_toTopOf="@+id/attackIndicator"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.583"
                     app:layout_constraintStart_toEndOf="@+id/hpText"
-                    app:layout_constraintBottom_toTopOf="@+id/attackIndicator"
                     app:layout_constraintTop_toBottomOf="@+id/pokemonHeight"
+                    app:layout_constraintVertical_bias="0.48000002"
                     app:trackCornerRadius="6dp"
                     app:trackThickness="14dp"
                     tools:progress="70" />
@@ -201,10 +198,11 @@
                     android:id="@+id/attackText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
                     android:text="@string/attack"
                     android:textSize="18sp"
+                    app:autoSizeTextType="uniform"
+                    app:layout_constraintEnd_toStartOf="@+id/attackIndicator"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/hpText" />
@@ -228,10 +226,11 @@
                     android:id="@+id/defenseText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
                     android:text="@string/defense"
                     android:textSize="18sp"
+                    app:autoSizeTextType="uniform"
+                    app:layout_constraintEnd_toStartOf="@+id/defenseIndicator"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/attackText" />
@@ -255,10 +254,11 @@
                     android:id="@+id/specialAttackText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
                     android:layout_marginTop="16dp"
                     android:text="@string/special_attack"
                     android:textSize="18sp"
+                    app:autoSizeTextType="uniform"
+                    app:layout_constraintEnd_toStartOf="@+id/specialAttackIndicator"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/defenseText" />
@@ -282,10 +282,11 @@
                     android:id="@+id/specialDefenseText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
                     android:layout_marginTop="16dp"
                     android:text="@string/special_defense"
                     android:textSize="18sp"
+                    app:autoSizeTextType="uniform"
+                    app:layout_constraintEnd_toStartOf="@+id/specialDefenseIndicator"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/specialAttackText" />
@@ -310,11 +311,12 @@
                     android:id="@+id/speedText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="16dp"
                     android:text="@string/speed"
                     android:textSize="18sp"
+                    app:autoSizeTextType="uniform"
+                    app:layout_constraintEnd_toStartOf="@+id/speedIndicator"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/specialDefenseText" />
@@ -332,6 +334,19 @@
                     app:trackCornerRadius="6dp"
                     app:trackThickness="14dp"
                     tools:progress="70" />
+
+                <ProgressBar
+                    android:id="@+id/detailProgressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.61"
+                    tools:visibility="visible" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
