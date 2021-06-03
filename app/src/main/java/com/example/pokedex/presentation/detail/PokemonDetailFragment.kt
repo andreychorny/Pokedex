@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.palette.graphics.Palette
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -55,7 +56,10 @@ class PokemonDetailFragment : Fragment() {
         val args = PokemonDetailFragmentArgs.fromBundle(requireArguments())
         _binding = FragmentPokemonDetailBinding.inflate(inflater)
         binding.lifecycleOwner = this
-
+        val navController = this.findNavController()
+        binding.backIcon.setOnClickListener{
+            navController.navigateUp()
+        }
         pokemonDetailViewModel.viewState().observe(viewLifecycleOwner, { state ->
             when (state) {
                 is PokemonDetailViewState.Loading -> {
@@ -163,13 +167,11 @@ class PokemonDetailFragment : Fragment() {
         ): Boolean {
             resource?.let {
                 val palette = Palette.from(it).generate()
-                binding.pokemonDetailCard.setBackgroundColor(palette.getLightMutedColor(Color.WHITE))
+                binding.pokemonDetailCard.setBackgroundColor(palette.getLightMutedColor(Color.LTGRAY))
                 binding.pokemonDetailName.setTextColor(palette.getDarkVibrantColor(Color.BLACK))
 
-//                SETING APPBAR COLOR THE SAME AS BACKGROUND FOR PICTURE
-//                (activity as AppCompatActivity).supportActionBar?.setBackgroundDrawable(
-//                    ColorDrawable(palette.getLightMutedColor(Color.WHITE))
-//                )
+                val window = activity?.window
+                window?.statusBarColor = palette.getLightMutedColor(Color.LTGRAY)
             }
 
             return false

@@ -36,10 +36,18 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
-
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:id="@+id/backIcon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:layout_gravity="top|start"
+                            android:layout_margin="@dimen/normal_spacing"
+                            android:adjustViewBounds="true"
+                            android:src="@drawable/back_icon" />
 
                         <ImageView
                             android:id="@+id/pokemonImage"
@@ -154,6 +162,15 @@
                         tools:visibility="visible" />
                 </com.google.android.material.chip.ChipGroup>
 
+                <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/barrier"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:barrierDirection="start"
+                    app:constraint_referenced_ids="hpIndicator, attackIndicator, defenseIndicator,
+                        specialAttackIndicator, specialDefenseIndicator, speedIndicator"
+                    />
+
                 <TextView
                     android:id="@+id/hpText"
                     android:layout_width="wrap_content"
@@ -169,12 +186,12 @@
                     android:id="@+id/hpIndicator"
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
                     android:layout_marginTop="20dp"
                     app:indicatorColor="@android:color/holo_red_dark"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.583"
                     app:layout_constraintStart_toEndOf="@+id/hpText"
+                    app:layout_constraintBottom_toTopOf="@+id/attackIndicator"
                     app:layout_constraintTop_toBottomOf="@+id/pokemonHeight"
                     app:trackCornerRadius="6dp"
                     app:trackThickness="14dp"
@@ -196,11 +213,12 @@
                     android:id="@+id/attackIndicator"
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="24dp"
+                    android:layout_marginTop="28dp"
                     app:indicatorColor="@android:color/holo_blue_dark"
+                    app:layout_constraintBottom_toTopOf="@+id/defenseIndicator"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/attackText"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toEndOf="@+id/barrier"
                     app:layout_constraintTop_toBottomOf="@+id/hpIndicator"
                     app:trackCornerRadius="6dp"
                     app:trackThickness="14dp"
@@ -222,12 +240,12 @@
                     android:id="@+id/defenseIndicator"
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
                     android:layout_marginTop="26dp"
                     app:indicatorColor="@android:color/holo_orange_light"
+                    app:layout_constraintBottom_toTopOf="@+id/specialAttackIndicator"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.509"
-                    app:layout_constraintStart_toEndOf="@+id/defenseText"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toEndOf="@+id/barrier"
                     app:layout_constraintTop_toBottomOf="@+id/attackIndicator"
                     app:trackCornerRadius="6dp"
                     app:trackThickness="14dp"
@@ -249,12 +267,12 @@
                     android:id="@+id/specialAttackIndicator"
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
                     android:layout_marginTop="26dp"
                     app:indicatorColor="@android:color/holo_green_dark"
+                    app:layout_constraintBottom_toTopOf="@+id/specialDefenseIndicator"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.166"
-                    app:layout_constraintStart_toEndOf="@+id/specialAttackText"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toEndOf="@+id/barrier"
                     app:layout_constraintTop_toBottomOf="@+id/defenseIndicator"
                     app:trackCornerRadius="6dp"
                     app:trackThickness="14dp"
@@ -276,13 +294,14 @@
                     android:id="@+id/specialDefenseIndicator"
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
                     android:layout_marginTop="26dp"
                     app:indicatorColor="@android:color/holo_purple"
+                    app:layout_constraintBottom_toTopOf="@+id/speedIndicator"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.166"
-                    app:layout_constraintStart_toEndOf="@+id/specialDefenseText"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toEndOf="@+id/barrier"
                     app:layout_constraintTop_toBottomOf="@+id/specialAttackIndicator"
+
                     app:trackCornerRadius="6dp"
                     app:trackThickness="14dp"
                     tools:progress="70" />
@@ -304,13 +323,11 @@
                     android:id="@+id/speedIndicator"
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
                     android:layout_marginTop="26dp"
-                    android:layout_marginBottom="16dp"
                     app:indicatorColor="@android:color/holo_blue_bright"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.509"
-                    app:layout_constraintStart_toEndOf="@+id/speedText"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toEndOf="@+id/barrier"
                     app:layout_constraintTop_toBottomOf="@+id/specialDefenseIndicator"
                     app:trackCornerRadius="6dp"
                     app:trackThickness="14dp"
