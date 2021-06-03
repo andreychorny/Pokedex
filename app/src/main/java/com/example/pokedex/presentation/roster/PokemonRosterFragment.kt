@@ -2,6 +2,7 @@ package com.example.pokedex.presentation.roster
 
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.widget.Toolbar
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -30,7 +31,8 @@ class PokemonRosterFragment : Fragment() {
     ): View {
         _binding = FragmentPokemonRosterBinding.inflate(inflater)
         binding.lifecycleOwner = this
-
+        binding.toolbarRoster.inflateMenu(R.menu.overflow_menu)
+        binding.toolbarRoster.setOnMenuItemClickListener(onMenuItemClick())
         initRecyclerView()
         binding.pokemonRoster.adapter = adapter
         pokemonRosterViewModel.viewState().observe(viewLifecycleOwner) { state ->
@@ -50,6 +52,22 @@ class PokemonRosterFragment : Fragment() {
         setScrollingToTop()
         setHasOptionsMenu(true)
         return binding.root
+    }
+
+    private fun onMenuItemClick() = object : MenuItem.OnMenuItemClickListener,
+        Toolbar.OnMenuItemClickListener {
+        override fun onMenuItemClick(item: MenuItem): Boolean {
+            pokemonRosterViewModel.updateFilter(
+                when (item.itemId) {
+                    R.id.show_generation_menu -> PokemonApiFilter.SHOW_GENERATION
+                    R.id.show_type_menu -> PokemonApiFilter.SHOW_TYPE
+                    R.id.show_liked -> PokemonApiFilter.SHOW_LIKED
+                    else -> PokemonApiFilter.SHOW_ALL
+                }
+            )
+            return true
+        }
+
     }
 
     override fun onDestroyView() {
@@ -81,18 +99,6 @@ class PokemonRosterFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.overflow_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        pokemonRosterViewModel.updateFilter(
-            when (item.itemId) {
-                R.id.show_generation_menu -> PokemonApiFilter.SHOW_GENERATION
-                R.id.show_type_menu -> PokemonApiFilter.SHOW_TYPE
-                R.id.show_liked -> PokemonApiFilter.SHOW_LIKED
-                else -> PokemonApiFilter.SHOW_ALL
-            }
-        )
-        return true
     }
 
     private fun initRecyclerView() {

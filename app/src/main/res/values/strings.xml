@@ -17,4 +17,5 @@
     <string name="special_attack">SP.ATK</string>
     <string name="special_defense">SP.DEF</string>
     <string name="speed">SPD</string>
+    <string name="toolbarTitle">Pokedex</string>
 </resources>
