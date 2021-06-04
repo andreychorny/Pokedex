@@ -40,10 +40,6 @@ class PokemonDetailFragment : Fragment() {
             duration = 500L
             scrimColor = Color.TRANSPARENT
         }
-//        OPTION №2 WITHOUT FIX:
-//        sharedElementEnterTransition = MaterialElevationScale(true).apply {
-//            duration = 500L
-//        }
 
     }
 
@@ -102,8 +98,9 @@ class PokemonDetailFragment : Fragment() {
         binding.speedIndicator.isVisible = true
 
         binding.pokemonDetailName.text = pokemonDetail.name
-        binding.pokemonHeight.text = pokemonDetail.height.toString()
-        binding.pokemonWeight.text = pokemonDetail.weight.toString()
+        binding.pokemonHeight.text = ((pokemonDetail.height * 10).toString() + "cm")
+        val weightInKg = (pokemonDetail.weight.toDouble() / 10.0)
+        binding.pokemonWeight.text = (String.format("%.2f", weightInKg) + "kg")
         setImage(pokemonDetail)
         setTypeChipGroup(pokemonDetail)
         binding.hpIndicator.progress = pokemonDetail.stats["hp"] ?: 0
