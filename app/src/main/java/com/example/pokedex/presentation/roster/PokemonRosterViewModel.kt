@@ -86,18 +86,18 @@ class PokemonRosterViewModel(private val repositoryCacheable: CacheablePokemonRe
         when (filter) {
             PokemonApiFilter.SHOW_GENERATION -> {
                 loadGenerationsFromNet(resultList)
-                val pokemons = repositoryCacheable.downloadPokemonByGeneration(currentGenerationId)
+                val pokemons = repositoryCacheable.downloadPokemonByGeneration(currentGenerationId, viewModelScope)
                 resultList.addAll(pokemons.map { it.toItem() })
                 viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
             }
             PokemonApiFilter.SHOW_TYPE -> {
                 loadTypesFromNet(resultList)
-                val pokemons = repositoryCacheable.downloadPokemonByType(currentTypeId)
+                val pokemons = repositoryCacheable.downloadPokemonByType(currentTypeId, viewModelScope)
                 resultList.addAll(pokemons.map { it.toItem() })
                 viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
             }
             PokemonApiFilter.SHOW_ALL -> {
-                val pokemons = repositoryCacheable.downloadAllPokemon()
+                val pokemons = repositoryCacheable.downloadAllPokemon(viewModelScope)
                 resultList.addAll(pokemons.map { it.toItem() })
                 viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
             }
@@ -108,7 +108,7 @@ class PokemonRosterViewModel(private val repositoryCacheable: CacheablePokemonRe
     }
 
     private suspend fun loadTypesFromNet(resultList: MutableList<RosterItem>) {
-        val typeList = repositoryCacheable.downloadTypeList()
+        val typeList = repositoryCacheable.downloadTypeList(viewModelScope)
         resultList.add(TypeListItem(typeList
             //backend contains empty dummy types with no pokemons. Those types are secluded
             //by having much higher id than normal (currently it's 10001 and 10002)
@@ -121,7 +121,7 @@ class PokemonRosterViewModel(private val repositoryCacheable: CacheablePokemonRe
     }
 
     private suspend fun loadGenerationsFromNet(resultList: MutableList<RosterItem>) {
-        val generationList = repositoryCacheable.downloadGenerationList()
+        val generationList = repositoryCacheable.downloadGenerationList(viewModelScope)
         resultList.add(
             GenerationListItem(
                 generationList.map { it.id to it.name }.toMap(),

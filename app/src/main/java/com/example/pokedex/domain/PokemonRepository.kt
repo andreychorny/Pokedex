@@ -1,18 +1,20 @@
 package com.example.pokedex.domain
 
+import kotlinx.coroutines.CoroutineScope
+
 
 interface PokemonRepository {
 
-    suspend fun downloadPokemonDetail(id: Long): PokemonDetailEntity
+    suspend fun downloadPokemonDetail(id: Long, scope: CoroutineScope): PokemonDetailEntity
 
-    suspend fun downloadGenerationList(): List<GenerationEntity>
+    suspend fun downloadGenerationList(scope: CoroutineScope): List<GenerationEntity>
 
-    suspend fun downloadAllPokemon(): List<PokemonEntity>
+    suspend fun downloadAllPokemon(scope: CoroutineScope): List<PokemonEntity>
 
-    suspend fun downloadPokemonByGeneration(generationId: Long): List<PokemonEntity>
+    suspend fun downloadPokemonByGeneration(generationId: Long, scope: CoroutineScope): List<PokemonEntity>
 
-    suspend fun downloadPokemonByType(typeId: Long): List<PokemonEntity>
+    suspend fun downloadPokemonByType(typeId: Long, scope: CoroutineScope): List<PokemonEntity>
 
-    suspend fun downloadTypeList(): List<TypeEntity>
+    suspend fun downloadTypeList(scope: CoroutineScope): List<TypeEntity>
 
 }

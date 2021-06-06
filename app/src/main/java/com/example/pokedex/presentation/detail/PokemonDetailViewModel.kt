@@ -37,7 +37,7 @@ class PokemonDetailViewModel(private val repositoryCacheable: CacheablePokemonRe
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
-                    repositoryCacheable.downloadPokemonDetail(id)
+                    repositoryCacheable.downloadPokemonDetail(id, viewModelScope)
                 } catch (e: Exception) {
                     viewStateLiveData.postValue(PokemonDetailViewState.Error("Network error"))
                 }

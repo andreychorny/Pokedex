@@ -2,11 +2,15 @@ package com.example.pokedex.data.network
 
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface PokemonRosterService {
 
     @GET("pokemon")
-    suspend fun getAllPokemonRoster(): PokemonListResponse
+    suspend fun getAllPokemonRoster(
+        @Query("limit") limit: Int = 20,
+        @Query("offset") offset: Int = 0
+    ): PokemonListResponse
 
     @GET("generation")
     suspend fun getAllGenerations(): GenerationListResponse
