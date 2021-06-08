@@ -28,11 +28,3 @@ interface PokemonRosterService {
     suspend fun getPokemonRosterByType(@Path("id") name: Long): TypeOfPokemonsResponse
 
 }
-
-enum class PokemonApiFilter {
-    SHOW_GENERATION,
-    SHOW_TYPE,
-    SHOW_LIKED,
-    SHOW_ALL
-}
-

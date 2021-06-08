@@ -11,7 +11,6 @@ import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pokedex.R
-import com.example.pokedex.data.network.PokemonApiFilter
 import com.example.pokedex.databinding.FragmentPokemonRosterBinding
 import com.example.pokedex.presentation.roster.adapter.PokemonRosterAdapter
 import com.example.pokedex.presentation.roster.adapter.RosterItem

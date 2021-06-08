@@ -1,5 +1,6 @@
 package com.example.pokedex.domain
 
+import com.example.pokedex.presentation.roster.PokemonApiFilter
 import kotlinx.coroutines.CoroutineScope
 
 
@@ -9,11 +10,7 @@ interface PokemonRepository {
 
     suspend fun downloadGenerationList(scope: CoroutineScope): List<GenerationEntity>
 
-    suspend fun downloadAllPokemon(scope: CoroutineScope): List<PokemonEntity>
-
-    suspend fun downloadPokemonByGeneration(generationId: Long, scope: CoroutineScope): List<PokemonEntity>
-
-    suspend fun downloadPokemonByType(typeId: Long, scope: CoroutineScope): List<PokemonEntity>
+    suspend fun downloadPokemonList(filter: PokemonApiFilter, scope: CoroutineScope): List<PokemonEntity>
 
     suspend fun downloadTypeList(scope: CoroutineScope): List<TypeEntity>
 

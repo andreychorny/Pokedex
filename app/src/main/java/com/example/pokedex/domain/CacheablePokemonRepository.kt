@@ -1,17 +1,14 @@
 package com.example.pokedex.domain
 
-import com.example.pokedex.data.network.PokemonApiFilter
 import com.example.pokedex.database.entity.DbPokemonDetail
+import com.example.pokedex.presentation.roster.PokemonApiFilter
 import kotlinx.coroutines.flow.Flow
 
 interface CacheablePokemonRepository: PokemonRepository {
 
     suspend fun updatePokemonInDatabase(dbPokemonDetail: DbPokemonDetail)
 
-    suspend fun getPokemonList(
-        filter: PokemonApiFilter,
-        generationId: Long = 1, typeId: Long = 1
-    ): List<PokemonEntity>
+    suspend fun getPokemonList(filter: PokemonApiFilter): List<PokemonEntity>
 
     suspend fun getGenerationsList(): List<GenerationEntity>
 

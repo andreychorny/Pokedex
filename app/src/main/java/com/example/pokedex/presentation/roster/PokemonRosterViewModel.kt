@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.pokedex.data.network.PokemonApiFilter
 import com.example.pokedex.domain.PokemonEntity
 import com.example.pokedex.domain.CacheablePokemonRepository
 import com.example.pokedex.presentation.roster.adapter.*
@@ -16,7 +15,6 @@ class PokemonRosterViewModel(private val repositoryCacheable: CacheablePokemonRe
     private val viewStateLiveData = MutableLiveData<PokemonRosterViewState>()
     fun viewState(): LiveData<PokemonRosterViewState> = viewStateLiveData
 
-    //TODO: retrieve currentGenerationId as minimal generation id from query of all generations
     private var currentGenerationId: Long = 1
     private var currentTypeId: Long = 1
     private var filter: PokemonApiFilter
@@ -40,13 +38,15 @@ class PokemonRosterViewModel(private val repositoryCacheable: CacheablePokemonRe
 
     private suspend fun loadFromDatabase() {
         val resultList = mutableListOf<RosterItem>()
-        if (filter == PokemonApiFilter.SHOW_GENERATION) {
+        if (filter is PokemonApiFilter.SHOW_GENERATION) {
+            (filter as PokemonApiFilter.SHOW_GENERATION).id = currentGenerationId
             loadGenerationsFromDatabase(resultList)
         }
-        if (filter == PokemonApiFilter.SHOW_TYPE) {
+        if (filter is PokemonApiFilter.SHOW_TYPE) {
+            (filter as PokemonApiFilter.SHOW_TYPE).id = currentTypeId
             loadTypesFromDatabase(resultList)
         }
-        val pokemons = repositoryCacheable.getPokemonList(filter, currentGenerationId, currentTypeId)
+        val pokemons = repositoryCacheable.getPokemonList(filter)
         if(pokemons.isNotEmpty()){
             resultList.addAll(pokemons.map { it.toItem() })
             viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
@@ -82,28 +82,21 @@ class PokemonRosterViewModel(private val repositoryCacheable: CacheablePokemonRe
     }
 
     private suspend fun loadRosterFromNet() {
-        val resultList = mutableListOf<RosterItem>()
-        when (filter) {
-            PokemonApiFilter.SHOW_GENERATION -> {
+        if(filter is PokemonApiFilter.SHOW_LIKED){
+            loadFromDatabase()
+        }else{
+            val resultList = mutableListOf<RosterItem>()
+            if (filter is PokemonApiFilter.SHOW_GENERATION) {
+                (filter as PokemonApiFilter.SHOW_GENERATION).id = currentGenerationId
                 loadGenerationsFromNet(resultList)
-                val pokemons = repositoryCacheable.downloadPokemonByGeneration(currentGenerationId, viewModelScope)
-                resultList.addAll(pokemons.map { it.toItem() })
-                viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
             }
-            PokemonApiFilter.SHOW_TYPE -> {
+            if (filter is PokemonApiFilter.SHOW_TYPE) {
+                (filter as PokemonApiFilter.SHOW_TYPE).id = currentTypeId
                 loadTypesFromNet(resultList)
-                val pokemons = repositoryCacheable.downloadPokemonByType(currentTypeId, viewModelScope)
-                resultList.addAll(pokemons.map { it.toItem() })
-                viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
             }
-            PokemonApiFilter.SHOW_ALL -> {
-                val pokemons = repositoryCacheable.downloadAllPokemon(viewModelScope)
-                resultList.addAll(pokemons.map { it.toItem() })
-                viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
-            }
-            PokemonApiFilter.SHOW_LIKED -> {
-                loadFromDatabase()
-            }
+            val pokemons = repositoryCacheable.downloadPokemonList(filter, viewModelScope)
+            resultList.addAll(pokemons.map { it.toItem() })
+            viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
         }
     }
 

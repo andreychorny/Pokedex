@@ -8,33 +8,31 @@ import com.example.pokedex.database.entity.PokemonToGeneration
 import com.example.pokedex.database.entity.PokemonTypeCrossRef
 import com.example.pokedex.database.entity.asDomainEntity
 import com.example.pokedex.domain.*
-import com.example.pokedex.data.network.PokemonApiFilter
 import com.example.pokedex.data.network.PokemonRosterService
 import com.example.pokedex.generateOfficialArtworkUrlFromId
 import com.example.pokedex.generateSpritePicUrlFromId
+import com.example.pokedex.presentation.roster.PokemonApiFilter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.lang.IllegalArgumentException
 
 class NetworkCacheablePokemonRepository(
     private val api: PokemonRosterService,
     private val database: PokedexDatabase
 ) : CacheablePokemonRepository {
 
-    override suspend fun getPokemonList(
-        filter: PokemonApiFilter,
-        generationId: Long, typeId: Long
-    ): List<PokemonEntity> {
+    override suspend fun getPokemonList(filter: PokemonApiFilter): List<PokemonEntity> {
         var pokemons: List<PokemonEntity>
         withContext(Dispatchers.IO) {
             pokemons = when (filter) {
-                PokemonApiFilter.SHOW_ALL -> retrieveAllPokemon()
-                PokemonApiFilter.SHOW_GENERATION -> retrievePokemonByGeneration(generationId)
-                PokemonApiFilter.SHOW_TYPE -> retrievePokemonByType(typeId)
-                PokemonApiFilter.SHOW_LIKED -> retrieveLikedPokemon()
+                is PokemonApiFilter.SHOW_ALL -> retrieveAllPokemon()
+                is PokemonApiFilter.SHOW_GENERATION -> retrievePokemonByGeneration(filter.id)
+                is PokemonApiFilter.SHOW_TYPE -> retrievePokemonByType(filter.id)
+                is PokemonApiFilter.SHOW_LIKED -> retrieveLikedPokemon()
             }
         }
         return pokemons
@@ -42,7 +40,7 @@ class NetworkCacheablePokemonRepository(
 
     override suspend fun getGenerationsList(): List<GenerationEntity> {
         var generations = listOf<GenerationEntity>()
-        withContext(Dispatchers.IO){
+        withContext(Dispatchers.IO) {
             generations = database.generationDao.getGenerationList().map { it.asDomainEntity() }
         }
         return generations
@@ -53,17 +51,34 @@ class NetworkCacheablePokemonRepository(
             val id = RETRIEVE_ID_REGEX.find(it.url)!!.value.toLong()
             GenerationEntity(id, it.name)
         }
-        scope.launch(Dispatchers.IO){
+        scope.launch(Dispatchers.IO) {
             database.generationDao.insert(generations.map { it.asDatabaseEntity() })
         }
         return generations
+    }
+
+    override suspend fun downloadPokemonList(
+        filter: PokemonApiFilter,
+        scope: CoroutineScope
+    ): List<PokemonEntity> {
+        var pokemons: List<PokemonEntity> = when (filter) {
+            is PokemonApiFilter.SHOW_ALL -> downloadAllPokemon(scope)
+            is PokemonApiFilter.SHOW_GENERATION -> downloadPokemonByGeneration(filter.id, scope)
+            is PokemonApiFilter.SHOW_TYPE -> downloadPokemonByType(filter.id, scope)
+            else -> throw IllegalArgumentException("No SHOW_LIKED type for downloading from net is allowed")
+        }
+
+        return pokemons
     }
 
     override suspend fun getPokemonById(id: Long): Flow<PokemonDetailEntity?> {
         return database.pokemonDao.getPokemonDetail(id).map { it?.asDomainEntity() }
     }
 
-    override suspend fun downloadPokemonDetail(id: Long, scope: CoroutineScope): PokemonDetailEntity {
+    override suspend fun downloadPokemonDetail(
+        id: Long,
+        scope: CoroutineScope
+    ): PokemonDetailEntity {
 
         val oldIsLiked = database.pokemonDao.isPokemonLiked(id)
         val jsonPokemon = api.getPokemonDetails(id)
@@ -100,12 +115,17 @@ class NetworkCacheablePokemonRepository(
     }
 
 
-    override suspend fun downloadAllPokemon(scope: CoroutineScope): List<PokemonEntity> {
+    private suspend fun downloadAllPokemon(scope: CoroutineScope): List<PokemonEntity> {
         val pokemons = api.getAllPokemonRoster().results
             .filter { RETRIEVE_ID_REGEX.containsMatchIn(it.url) }
             .map {
                 val id = RETRIEVE_ID_REGEX.find(it.url)!!.value.toLong()
-                PokemonEntity(id, it.name, generateOfficialArtworkUrlFromId(id), generateSpritePicUrlFromId(id))
+                PokemonEntity(
+                    id,
+                    it.name,
+                    generateOfficialArtworkUrlFromId(id),
+                    generateSpritePicUrlFromId(id)
+                )
             }
         scope.launch(Dispatchers.IO) {
             database.pokemonDao.insertBaseInfoList(pokemons.map { it.asDatabaseEntity() })
@@ -118,12 +138,20 @@ class NetworkCacheablePokemonRepository(
             .map { it.asDomainEntity() }
     }
 
-    override suspend fun downloadPokemonByGeneration(generationId: Long, scope: CoroutineScope): List<PokemonEntity> {
+    private suspend fun downloadPokemonByGeneration(
+        generationId: Long,
+        scope: CoroutineScope
+    ): List<PokemonEntity> {
         val pokemons = api.getPokemonRosterByGeneration(generationId).results
             .filter { RETRIEVE_ID_REGEX.containsMatchIn(it.url) }
             .map {
                 val id = RETRIEVE_ID_REGEX.find(it.url)!!.value.toLong()
-                PokemonEntity(id, it.name, generateOfficialArtworkUrlFromId(id), generateSpritePicUrlFromId(id))
+                PokemonEntity(
+                    id,
+                    it.name,
+                    generateOfficialArtworkUrlFromId(id),
+                    generateSpritePicUrlFromId(id)
+                )
             }
         scope.launch(Dispatchers.IO) {
             database.pokemonDao.insertBaseInfoList(pokemons.map { it.asDatabaseEntity() })
@@ -142,12 +170,20 @@ class NetworkCacheablePokemonRepository(
             .map { it.asDomainEntity() }
     }
 
-    override suspend fun downloadPokemonByType(typeId: Long, scope: CoroutineScope): List<PokemonEntity> {
+    private suspend fun downloadPokemonByType(
+        typeId: Long,
+        scope: CoroutineScope
+    ): List<PokemonEntity> {
         val pokemons = api.getPokemonRosterByType(typeId).results
             .filter { RETRIEVE_ID_REGEX.containsMatchIn(it.pokemon.url) }
             .map {
                 val id = RETRIEVE_ID_REGEX.find(it.pokemon.url)!!.value.toLong()
-                PokemonEntity(id, it.pokemon.name, generateOfficialArtworkUrlFromId(id), generateSpritePicUrlFromId(id))
+                PokemonEntity(
+                    id,
+                    it.pokemon.name,
+                    generateOfficialArtworkUrlFromId(id),
+                    generateSpritePicUrlFromId(id)
+                )
             }
         scope.launch(Dispatchers.IO) {
             database.pokemonDao.insertBaseInfoList(pokemons.map { it.asDatabaseEntity() })
@@ -163,7 +199,7 @@ class NetworkCacheablePokemonRepository(
 
     override suspend fun getTypesList(): List<TypeEntity> {
         var types = listOf<TypeEntity>()
-        withContext(Dispatchers.IO){
+        withContext(Dispatchers.IO) {
             types = database.typeDao.getTypeList().map { it.asDomainEntity() }
         }
         return types
