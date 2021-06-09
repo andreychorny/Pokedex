@@ -38,24 +38,49 @@ class PokemonRosterViewModel(private val repositoryCacheable: CacheablePokemonRe
 
     private suspend fun loadFromDatabase() {
         val resultList = mutableListOf<RosterItem>()
-        if (filter is PokemonApiFilter.SHOW_GENERATION) {
-            (filter as PokemonApiFilter.SHOW_GENERATION).id = currentGenerationId
-            loadGenerationsFromDatabase(resultList)
+        when(filter){
+            PokemonApiFilter.SHOW_GENERATION -> {
+                loadGenerationsFromDatabase(resultList)
+                val pokemons = repositoryCacheable.getPokemonByGenerationFromDB(currentGenerationId)
+                if(pokemons.isNotEmpty()){
+                    resultList.addAll(pokemons.map { it.toItem() })
+                    viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
+                }else{
+                    viewStateLiveData.value = PokemonRosterViewState.Error("Loading failed, no internet connection")
+                }
+            }
+            PokemonApiFilter.SHOW_TYPE -> {
+                loadTypesFromDatabase(resultList)
+                val pokemons = repositoryCacheable.getPokemonByTypeFromDB(currentTypeId)
+                if(pokemons.isNotEmpty()){
+                    resultList.addAll(pokemons.map { it.toItem() })
+                    viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
+                }else{
+                    viewStateLiveData.value = PokemonRosterViewState.Error("Loading failed, no internet connection")
+                }
+            }
+            PokemonApiFilter.SHOW_ALL -> {
+                val pokemons = repositoryCacheable.getAllPokemonFromDB()
+                if(pokemons.isNotEmpty()){
+                    resultList.addAll(pokemons.map { it.toItem() })
+                    viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
+                }else{
+                    viewStateLiveData.value = PokemonRosterViewState.Error("Loading failed, no internet connection")
+                }
+            }
+            PokemonApiFilter.SHOW_LIKED -> {
+                val pokemons = repositoryCacheable.getLikedPokemonFromDB()
+                if(pokemons.isNotEmpty()){
+                    resultList.addAll(pokemons.map { it.toItem() })
+                    viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
+                }else{
+                    resultList.add(EmptyStateItem)
+                    viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
+                }
+            }
+
         }
-        if (filter is PokemonApiFilter.SHOW_TYPE) {
-            (filter as PokemonApiFilter.SHOW_TYPE).id = currentTypeId
-            loadTypesFromDatabase(resultList)
-        }
-        val pokemons = repositoryCacheable.getPokemonList(filter)
-        if(pokemons.isNotEmpty()){
-            resultList.addAll(pokemons.map { it.toItem() })
-            viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
-        }else if(filter == PokemonApiFilter.SHOW_LIKED){
-            resultList.add(EmptyStateItem)
-            viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
-        }else{
-            viewStateLiveData.value = PokemonRosterViewState.Error("Loading failed, no internet connection")
-        }
+
     }
 
     private suspend fun loadTypesFromDatabase(resultList: MutableList<RosterItem>) {
@@ -82,21 +107,28 @@ class PokemonRosterViewModel(private val repositoryCacheable: CacheablePokemonRe
     }
 
     private suspend fun loadRosterFromNet() {
-        if(filter is PokemonApiFilter.SHOW_LIKED){
-            loadFromDatabase()
-        }else{
-            val resultList = mutableListOf<RosterItem>()
-            if (filter is PokemonApiFilter.SHOW_GENERATION) {
-                (filter as PokemonApiFilter.SHOW_GENERATION).id = currentGenerationId
+        val resultList = mutableListOf<RosterItem>()
+        when(filter){
+            PokemonApiFilter.SHOW_LIKED -> {
+                loadFromDatabase()
+            }
+            PokemonApiFilter.SHOW_ALL ->{
+                val pokemons = repositoryCacheable.downloadAllPokemon(viewModelScope)
+                resultList.addAll(pokemons.map { it.toItem() })
+                viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
+            }
+            PokemonApiFilter.SHOW_GENERATION -> {
                 loadGenerationsFromNet(resultList)
+                val pokemons = repositoryCacheable.downloadPokemonByGeneration(currentGenerationId, viewModelScope)
+                resultList.addAll(pokemons.map { it.toItem() })
+                viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
             }
-            if (filter is PokemonApiFilter.SHOW_TYPE) {
-                (filter as PokemonApiFilter.SHOW_TYPE).id = currentTypeId
+            PokemonApiFilter.SHOW_TYPE -> {
                 loadTypesFromNet(resultList)
+                val pokemons = repositoryCacheable.downloadPokemonByType(currentTypeId, viewModelScope)
+                resultList.addAll(pokemons.map { it.toItem() })
+                viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
             }
-            val pokemons = repositoryCacheable.downloadPokemonList(filter, viewModelScope)
-            resultList.addAll(pokemons.map { it.toItem() })
-            viewStateLiveData.value = PokemonRosterViewState.Data(resultList)
         }
     }
 

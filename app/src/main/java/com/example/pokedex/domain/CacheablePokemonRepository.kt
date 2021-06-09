@@ -8,7 +8,13 @@ interface CacheablePokemonRepository: PokemonRepository {
 
     suspend fun updatePokemonInDatabase(dbPokemonDetail: DbPokemonDetail)
 
-    suspend fun getPokemonList(filter: PokemonApiFilter): List<PokemonEntity>
+    suspend fun getAllPokemonFromDB(): List<PokemonEntity>
+
+    suspend fun getLikedPokemonFromDB(): List<PokemonEntity>
+
+    suspend fun getPokemonByGenerationFromDB(generationId: Long): List<PokemonEntity>
+
+    suspend fun getPokemonByTypeFromDB(typeId: Long): List<PokemonEntity>
 
     suspend fun getGenerationsList(): List<GenerationEntity>
 

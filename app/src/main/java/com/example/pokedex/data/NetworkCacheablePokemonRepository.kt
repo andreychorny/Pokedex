@@ -18,25 +18,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.lang.IllegalArgumentException
 
 class NetworkCacheablePokemonRepository(
     private val api: PokemonRosterService,
     private val database: PokedexDatabase
 ) : CacheablePokemonRepository {
-
-    override suspend fun getPokemonList(filter: PokemonApiFilter): List<PokemonEntity> {
-        var pokemons: List<PokemonEntity>
-        withContext(Dispatchers.IO) {
-            pokemons = when (filter) {
-                is PokemonApiFilter.SHOW_ALL -> retrieveAllPokemon()
-                is PokemonApiFilter.SHOW_GENERATION -> retrievePokemonByGeneration(filter.id)
-                is PokemonApiFilter.SHOW_TYPE -> retrievePokemonByType(filter.id)
-                is PokemonApiFilter.SHOW_LIKED -> retrieveLikedPokemon()
-            }
-        }
-        return pokemons
-    }
 
     override suspend fun getGenerationsList(): List<GenerationEntity> {
         var generations = listOf<GenerationEntity>()
@@ -55,20 +41,6 @@ class NetworkCacheablePokemonRepository(
             database.generationDao.insert(generations.map { it.asDatabaseEntity() })
         }
         return generations
-    }
-
-    override suspend fun downloadPokemonList(
-        filter: PokemonApiFilter,
-        scope: CoroutineScope
-    ): List<PokemonEntity> {
-        var pokemons: List<PokemonEntity> = when (filter) {
-            is PokemonApiFilter.SHOW_ALL -> downloadAllPokemon(scope)
-            is PokemonApiFilter.SHOW_GENERATION -> downloadPokemonByGeneration(filter.id, scope)
-            is PokemonApiFilter.SHOW_TYPE -> downloadPokemonByType(filter.id, scope)
-            else -> throw IllegalArgumentException("No SHOW_LIKED type for downloading from net is allowed")
-        }
-
-        return pokemons
     }
 
     override suspend fun getPokemonById(id: Long): Flow<PokemonDetailEntity?> {
@@ -106,16 +78,24 @@ class NetworkCacheablePokemonRepository(
     }
 
 
-    private fun retrieveAllPokemon(): List<PokemonEntity> {
-        return database.pokemonDao.getPokemonList().map { it.asDomainEntity() }
+    override suspend fun getAllPokemonFromDB(): List<PokemonEntity> {
+        var pokemons = listOf<PokemonEntity>()
+        withContext(Dispatchers.IO){
+            pokemons =  database.pokemonDao.getPokemonList().map { it.asDomainEntity() }
+        }
+        return pokemons
     }
 
-    private fun retrieveLikedPokemon(): List<PokemonEntity> {
-        return database.pokemonDao.getLikedPokemonList().map { it.asDomainEntity() }
+    override suspend fun getLikedPokemonFromDB(): List<PokemonEntity> {
+        var pokemons = listOf<PokemonEntity>()
+        withContext(Dispatchers.IO){
+            pokemons = database.pokemonDao.getLikedPokemonList().map { it.asDomainEntity() }
+        }
+        return pokemons
     }
 
 
-    private suspend fun downloadAllPokemon(scope: CoroutineScope): List<PokemonEntity> {
+    override suspend fun downloadAllPokemon(scope: CoroutineScope): List<PokemonEntity> {
         val pokemons = api.getAllPokemonRoster().results
             .filter { RETRIEVE_ID_REGEX.containsMatchIn(it.url) }
             .map {
@@ -133,12 +113,16 @@ class NetworkCacheablePokemonRepository(
         return pokemons
     }
 
-    private fun retrievePokemonByGeneration(generationId: Long): List<PokemonEntity> {
-        return database.pokemonDao.getPokemonListByGeneration(generationId)
-            .map { it.asDomainEntity() }
+    override suspend fun getPokemonByGenerationFromDB(generationId: Long): List<PokemonEntity> {
+        var pokemons = listOf<PokemonEntity>()
+        withContext(Dispatchers.IO){
+            pokemons = database.pokemonDao.getPokemonListByGeneration(generationId)
+                .map { it.asDomainEntity() }
+        }
+        return pokemons
     }
 
-    private suspend fun downloadPokemonByGeneration(
+    override suspend fun downloadPokemonByGeneration(
         generationId: Long,
         scope: CoroutineScope
     ): List<PokemonEntity> {
@@ -165,12 +149,16 @@ class NetworkCacheablePokemonRepository(
         return pokemons
     }
 
-    private fun retrievePokemonByType(typeId: Long): List<PokemonEntity> {
-        return database.pokemonDao.getPokemonListByType(typeId)
-            .map { it.asDomainEntity() }
+    override suspend fun getPokemonByTypeFromDB(typeId: Long): List<PokemonEntity> {
+        var pokemons = listOf<PokemonEntity>()
+        withContext(Dispatchers.IO){
+            pokemons =  database.pokemonDao.getPokemonListByType(typeId)
+                .map { it.asDomainEntity() }
+        }
+        return pokemons
     }
 
-    private suspend fun downloadPokemonByType(
+    override suspend fun downloadPokemonByType(
         typeId: Long,
         scope: CoroutineScope
     ): List<PokemonEntity> {
