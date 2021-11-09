@@ -1,5 +1,6 @@
 package com.example.pokedex.database.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.pokedex.database.entity.DbGeneration
 import com.example.pokedex.database.entity.DbType
@@ -14,6 +15,6 @@ interface TypeDao {
 
     @Transaction
     @Query("SELECT * FROM dbtype")
-    fun getTypeList(): List<DbType>
+    fun getTypeList(): LiveData<List<DbType>>
 
 }

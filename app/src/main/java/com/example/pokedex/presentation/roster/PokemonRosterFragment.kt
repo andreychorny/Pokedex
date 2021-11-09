@@ -1,6 +1,5 @@
 package com.example.pokedex.presentation.roster
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.Toolbar
@@ -12,8 +11,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pokedex.R
 import com.example.pokedex.databinding.FragmentPokemonRosterBinding
-import com.example.pokedex.presentation.roster.adapter.PokemonRosterAdapter
-import com.example.pokedex.presentation.roster.adapter.RosterItem
+import com.example.pokedex.domain.PokemonEntity
+import com.example.pokedex.presentation.roster.adapter.*
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialElevationScale
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -24,6 +23,8 @@ class PokemonRosterFragment : Fragment() {
     private var adapter: PokemonRosterAdapter? = null
     private var _binding: FragmentPokemonRosterBinding? = null
     private val binding get() = _binding!!
+    private var generationsList: GenerationListItem? = null
+    private var typeList: TypeListItem? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,18 +36,15 @@ class PokemonRosterFragment : Fragment() {
         binding.toolbarRoster.setOnMenuItemClickListener(onMenuItemClick())
         initRecyclerView()
         binding.pokemonRoster.adapter = adapter
-        pokemonRosterViewModel.viewState().observe(viewLifecycleOwner) { state ->
-            when (state) {
-                is PokemonRosterViewState.Loading -> {
-                    showProgress()
-                }
-                is PokemonRosterViewState.Data -> {
-                    showData(state.items)
-                }
-                is PokemonRosterViewState.Error -> {
-                    showError(state)
-                }
-            }
+        showProgress()
+        pokemonRosterViewModel.rosterLiveData().observe(viewLifecycleOwner) { list ->
+            showData(list.map { it.toItem() })
+        }
+        pokemonRosterViewModel.generationLiveData().observe(viewLifecycleOwner){ list ->
+            generationsList = list
+        }
+        pokemonRosterViewModel.typeLiveData().observe(viewLifecycleOwner){ list ->
+            typeList = list
         }
 
         setScrollingToTop()
@@ -119,9 +117,11 @@ class PokemonRosterFragment : Fragment() {
                 )
             },
             onGenerationItemClicked = { id: Long, isChecked: Boolean ->
+                showProgress()
                 pokemonRosterViewModel.updateGenerationId(id)
             },
             onTypeItemClicked = { id: Long, isChecked: Boolean ->
+                showProgress()
                 pokemonRosterViewModel.updateTypeId(id)
             }
         )
@@ -135,7 +135,15 @@ class PokemonRosterFragment : Fragment() {
     private fun showData(items: List<RosterItem>) {
         binding.rosterProgressBar.isVisible = false
         binding.rosterViewGroup.isVisible = true
-        adapter?.submitList(items)
+        val resultsList: MutableList<RosterItem> = mutableListOf()
+        if(pokemonRosterViewModel.filter == PokemonApiFilter.SHOW_GENERATION){
+            generationsList?.let { resultsList.add(it) }
+        }
+        if(pokemonRosterViewModel.filter == PokemonApiFilter.SHOW_TYPE){
+            typeList?.let { resultsList.add(it) }
+        }
+        resultsList.addAll(items)
+        adapter?.submitList(resultsList)
     }
 
     private fun showError(
@@ -150,3 +158,4 @@ class PokemonRosterFragment : Fragment() {
     }
 
 }
+fun PokemonEntity.toItem(): PokemonItem = PokemonItem(id, name, artImgUrl, spriteImgUrl)

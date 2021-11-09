@@ -1,5 +1,6 @@
 package com.example.pokedex.database.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.pokedex.database.entity.*
 import kotlinx.coroutines.flow.Flow
@@ -9,22 +10,22 @@ interface PokemonDao {
 
     @Transaction
     @Query("SELECT * FROM dbpokemonbaseinfo LIMIT 50")
-    fun getPokemonList(): List<DbPokemonBaseInfo>
+    fun getPokemonList(): LiveData<List<DbPokemonBaseInfo>>
 
     @Transaction
     @Query("SELECT * FROM dbpokemonbaseinfo WHERE pokemonId IN" +
             " (SELECT p.pokemonId FROM dbgeneration g LEFT JOIN pokemontogeneration p" +
             " ON g.generationId = p.generationId WHERE g.generationId = :generationId)")
-    fun getPokemonListByGeneration(generationId: Long): List<DbPokemonBaseInfo>
+    fun getPokemonListByGeneration(generationId: Long): LiveData<List<DbPokemonBaseInfo>>
 
     @Transaction
     @Query("SELECT * FROM dbpokemonbaseinfo WHERE pokemonId IN (SELECT p.pokemonId " +
             "FROM dbtype t LEFT JOIN pokemontypecrossref p ON t.typeId = p.typeId WHERE t.typeId = :typeId)")
-    fun getPokemonListByType(typeId: Long): List<DbPokemonBaseInfo>
+    fun getPokemonListByType(typeId: Long): LiveData<List<DbPokemonBaseInfo>>
 
     @Transaction
     @Query("SELECT * FROM dbpokemonbaseinfo WHERE pokemonId IN (SELECT pokemonId FROM dbpokemondetail WHERE isLiked = 1)")
-    fun getLikedPokemonList(): List<DbPokemonBaseInfo>
+    fun getLikedPokemonList(): LiveData<List<DbPokemonBaseInfo>>
 
     @Transaction
     @Query("SELECT isLiked FROM dbpokemondetail WHERE pokemonId = :pokemonId")
@@ -32,7 +33,7 @@ interface PokemonDao {
 
     @Transaction
     @Query("SELECT * FROM dbpokemondetail WHERE pokemonId = :pokemonId")
-    fun getPokemonDetail(pokemonId: Long): Flow<FullDbPokemonDetail?>
+    fun getPokemonDetail(pokemonId: Long): LiveData<FullDbPokemonDetail?>
 
 
     @Transaction

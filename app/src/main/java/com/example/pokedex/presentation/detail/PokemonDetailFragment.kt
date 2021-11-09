@@ -63,20 +63,9 @@ class PokemonDetailFragment : Fragment() {
         binding.backIcon.setOnClickListener{
             navController.navigateUp()
         }
-        pokemonDetailViewModel.viewState().observe(viewLifecycleOwner, { state ->
-            when (state) {
-                is PokemonDetailViewState.Loading -> {
-                    showProgress()
-                }
-                is PokemonDetailViewState.Data -> {
-                    showData(state.detail)
-                }
-                is PokemonDetailViewState.Error -> {
-                    showError(args.pokemonId, state.message)
-                }
-            }
+        pokemonDetailViewModel.detailLiveData().observe(viewLifecycleOwner, {
+            it?.let { showData(it) }
         })
-
         pokemonDetailViewModel.loadDetail(args.pokemonId)
         return binding.root
     }
